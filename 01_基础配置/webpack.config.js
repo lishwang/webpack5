@@ -47,6 +47,16 @@ module.exports = {
         test: /\.styl$/,
         use: ["style-loader", "css-loader", "stylus-loader"],
       },
+      {
+        test: /\.(png|jpe?g|gif|webp)$/,
+        type: "asset",
+        parser: {
+          // 如果图片不大于100kb，将会被转化成base64格式的图片字符串
+          dataUrlCondition: {
+            maxSize: 100 * 1024 // 100kb
+          }
+        }
+      },
     ]
   },
   // 插件

@@ -1,5 +1,6 @@
 .box1 {
   width: 100px;
   height: 100px;
-  background-color: #f00;
+  background-image: url('../img/222S45M0-3.jpg');
+  background-size: cover;
 }
