@@ -10,23 +10,23 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/add.js":
-/*!********************!*\
-  !*** ./src/add.js ***!
-  \********************/
+/***/ "./src/js/add.js":
+/*!***********************!*\
+  !*** ./src/js/add.js ***!
+  \***********************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ addFun)\n/* harmony export */ });\nfunction addFun (...args) {\r\n  return args.reduce((sum, current) => sum + current, 0)\r\n}\n\n//# sourceURL=webpack://webpack5/./src/add.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ addFun)\n/* harmony export */ });\nfunction addFun (...args) {\r\n  return args.reduce((sum, current) => sum + current, 0)\r\n}\n\n//# sourceURL=webpack://webpack5/./src/js/add.js?");
 
 /***/ }),
 
-/***/ "./src/alert.js":
-/*!**********************!*\
-  !*** ./src/alert.js ***!
-  \**********************/
+/***/ "./src/js/alert.js":
+/*!*************************!*\
+  !*** ./src/js/alert.js ***!
+  \*************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ alertFun)\n/* harmony export */ });\nfunction alertFun (count) {\r\n  alert(count);\r\n}\n\n//# sourceURL=webpack://webpack5/./src/alert.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ alertFun)\n/* harmony export */ });\nfunction alertFun (count) {\r\n  alert(count);\r\n}\n\n//# sourceURL=webpack://webpack5/./src/js/alert.js?");
 
 /***/ }),
 
@@ -36,7 +36,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \*********************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _add__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./add */ \"./src/add.js\");\n/* harmony import */ var _alert__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./alert */ \"./src/alert.js\");\n\r\n\r\n\r\n(0,_add__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(1, 2, 3, 4);\r\n(0,_alert__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(55);\n\n//# sourceURL=webpack://webpack5/./src/main.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _js_add__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./js/add */ \"./src/js/add.js\");\n/* harmony import */ var _js_alert__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./js/alert */ \"./src/js/alert.js\");\n\r\n\r\n\r\nconsole.log((0,_js_add__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(1, 2, 3, 4));;\r\n(0,_js_alert__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(55);\n\n//# sourceURL=webpack://webpack5/./src/main.js?");
 
 /***/ })
 
