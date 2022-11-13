@@ -10,8 +10,8 @@ module.exports = {
      * __dirname 是nodejs模块的一个变量，获取当前文件所在的文件夹的目录；
      * 'dist' 输出后的文件夹名称为 dist；
      */
-    path: path.resolve(__dirname, 'dist'), // 输出文件路径一般是绝对路径
-    filename: 'main.js', // 输出打包后的文件名
+    path: path.resolve(__dirname, 'dist'), // 输出文件路径一般是绝对路径，所有打包后的文件都在这个路径下
+    filename: 'static/js/main.js', // 入口文件输出打包后的文件名，其他文件打包后输出在其同级目录下
   },
   // 加载器
   module: {
@@ -55,7 +55,14 @@ module.exports = {
           dataUrlCondition: {
             maxSize: 100 * 1024 // 100kb
           }
-        }
+        },
+        generator: {
+          // 设置生成的图片名字以及打包输出的图片所在的目录
+          // hash 图片打包后会有一个唯一的id（图片默认情况下打包后的名字），这个id在webpack中被称为hash值；
+          // ext 文件扩展名，之前是 .png 打包后 ext 还是 .png；
+          // query 查询参数，如果在url地址中写了其他参数，这里会携带上；
+          filename: 'static/images/[hash][ext][query]'
+        },
       },
     ]
   },
