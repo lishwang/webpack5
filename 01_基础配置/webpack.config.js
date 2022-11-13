@@ -51,7 +51,8 @@ module.exports = {
       },
       {
         test: /\.(png|jpe?g|gif|webp)$/,
-        type: "asset",
+        type: "asset", // 将符合条件的文件转换成base64格式的字符串，然后打包输出；
+        // 需要转换成base64格式的文件的条件
         parser: {
           // 如果图片不大于100kb，将会被转化成base64格式的图片字符串
           dataUrlCondition: {
@@ -65,6 +66,15 @@ module.exports = {
           // ext 文件扩展名，之前是 .png 打包后 ext 还是 .png；
           // query 查询参数，如果在url地址中写了其他参数，这里会携带上；
           filename: 'static/images/[hash:6][ext][query]'
+        },
+      },
+      // 处理字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件；
+      {
+        test: /\.(ttf|woff2?|mp3|mp4|avi)$/, // 匹配字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件
+        type: "asset/resource", // 将文件原封不动的打包输出
+        generator: {
+          // 设置打包输出的文件名字以及打包输出的文件所在的目录
+          filename: 'static/media/[hash:6][ext][query]'
         },
       },
     ]

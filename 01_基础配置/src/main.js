@@ -5,6 +5,7 @@ import './less/index.less'
 import "./sass/index.sass";
 import "./sass/index.scss";
 import "./styl/index.styl";
+import './css/iconfont.css';
 
 console.log(addFun(1, 2, 3, 4));;
 alertFun(55);
