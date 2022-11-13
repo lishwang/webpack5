@@ -12,6 +12,8 @@ module.exports = {
      */
     path: path.resolve(__dirname, 'dist'), // 输出文件路径一般是绝对路径，所有打包后的文件都在这个路径下
     filename: 'static/js/main.js', // 入口文件输出打包后的文件名，其他文件打包后输出在其同级目录下
+    // 自动清空上次打包的内容
+    clean: true,
   },
   // 加载器
   module: {
@@ -59,9 +61,10 @@ module.exports = {
         generator: {
           // 设置生成的图片名字以及打包输出的图片所在的目录
           // hash 图片打包后会有一个唯一的id（图片默认情况下打包后的名字），这个id在webpack中被称为hash值；
+          // [hash:6] 表示取hash值的前六位最为图片的名字；
           // ext 文件扩展名，之前是 .png 打包后 ext 还是 .png；
           // query 查询参数，如果在url地址中写了其他参数，这里会携带上；
-          filename: 'static/images/[hash][ext][query]'
+          filename: 'static/images/[hash:6][ext][query]'
         },
       },
     ]
