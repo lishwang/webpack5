@@ -1,5 +1,10 @@
 import addFun from './js/add'
 import alertFun from './js/alert'
+import './css/index.css'
+import './less/index.less'
+import "./sass/index.sass";
+import "./sass/index.scss";
+import "./styl/index.styl";
 
 console.log(addFun(1, 2, 3, 4));;
 alertFun(55);

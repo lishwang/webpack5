@@ -16,7 +16,37 @@ module.exports = {
   // 加载器
   module: {
     rules: [
-      // loader的配置
+      // 处理css样式文件
+      {
+        test: /\.css$/, // 检测css文件
+        // loader 的执行顺序：从右到左（从下到上）
+        use: [
+          'style-loader', // 将 js 中的css代码通过创建style标签添加到html文件中使样式生效；
+          'css-loader', // 将 css 资源编译成 commonjs 的模块到js 中；
+        ]
+      },
+      // 处理less样式文件
+      {
+        test: /\.less$/,
+        use: [
+          "style-loader",
+          "css-loader",
+          "less-loader", // 将less文件处理成css文件
+        ],
+      },
+      // 处理sass样式文件
+      {
+        test: /\.s[ac]ss$/,
+        use: [
+          "style-loader",
+          "css-loader",
+          "sass-loader", // 负责将 Sass 文件编译成 css 文件
+        ],
+      },
+      {
+        test: /\.styl$/,
+        use: ["style-loader", "css-loader", "stylus-loader"],
+      },
     ]
   },
   // 插件
