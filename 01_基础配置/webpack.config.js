@@ -79,6 +79,15 @@ module.exports = {
           filename: 'static/media/[hash:6][ext][query]'
         },
       },
+      // webpack5 用 loader 处理 Babel 代码
+      {
+        test: /\.js$/,
+        exclude: /node_modules/, // 排除 node_modules 代码不编译
+        loader: "babel-loader",
+        // options: {
+        //   presets: ["@babel/preset-env"],
+        // }
+      }
     ]
   },
   // 插件
