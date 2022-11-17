@@ -107,6 +107,12 @@ module.exports = {
       template: path.resolve(__dirname, 'public/index.html'), // html模板路径可以为相对路径或者绝对路径；
     }),
   ],
+  // 开发服务器，需要运行 npx webpack serve 才能启动开发服务器，不会生成打包后的文件，而是在内存中编译打包的，而且修改完代码后自动打包且更新浏览器展示
+  devServer: {
+    host: "localhost", // 启动服务器域名
+    port: "3000", // 启动服务器端口号
+    open: true, // 是否自动打开浏览器
+  },
   // 模式
   mode: 'development',
 }
