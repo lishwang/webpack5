@@ -3,6 +3,8 @@ const path = require('path'); // nodejs模块，专门用来处理路径问题
 const ESLintWebpackPlugin = require("eslint-webpack-plugin");
 // 配置 HTML 模板，可以借助插件来实现打包后 js 文件的自动引入到 html 文件中
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+// 打包时将 CSS 提取到单独的文件中，并结合 HtmlWebpackPlugin 插件，可以实现 css 自动通过 link 标签引入到 html 文件中；
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   // 入口
@@ -27,7 +29,8 @@ module.exports = {
         test: /\.css$/, // 检测css文件
         // loader 的执行顺序：从右到左（从下到上）
         use: [
-          'style-loader', // 将 js 中的css代码通过创建style标签添加到html文件中使样式生效；
+          // 'style-loader', // 这个loader会动态创建style标签，将 js 中的css代码通过创建的style标签添加到html文件中使样式生效；
+          MiniCssExtractPlugin.loader, // 把css文件提取成单独的文件，所以不需要引入style-loader来创建style标签了；
           'css-loader', // 将 css 资源编译成 commonjs 的模块到js 中；
         ]
       },
@@ -35,7 +38,8 @@ module.exports = {
       {
         test: /\.less$/,
         use: [
-          "style-loader",
+          // "style-loader",
+          MiniCssExtractPlugin.loader, // 把css文件提取成单独的文件，所以不需要引入style-loader来创建style标签了；
           "css-loader",
           "less-loader", // 将less文件处理成css文件
         ],
@@ -44,14 +48,20 @@ module.exports = {
       {
         test: /\.s[ac]ss$/,
         use: [
-          "style-loader",
+          // "style-loader",
+          MiniCssExtractPlugin.loader, // 把css文件提取成单独的文件，所以不需要引入style-loader来创建style标签了；
           "css-loader",
           "sass-loader", // 负责将 Sass 文件编译成 css 文件
         ],
       },
       {
         test: /\.styl$/,
-        use: ["style-loader", "css-loader", "stylus-loader"],
+        use: [
+          // "style-loader", 
+          MiniCssExtractPlugin.loader, // 把css文件提取成单独的文件，所以不需要引入style-loader来创建style标签了；
+          "css-loader",
+          "stylus-loader"
+        ],
       },
       {
         test: /\.(png|jpe?g|gif|webp)$/,
@@ -87,7 +97,7 @@ module.exports = {
         exclude: /node_modules/, // 排除 node_modules 代码不编译
         loader: "babel-loader",
         // options: {
-        //   presets: ["@babel/preset-env"],
+        //   presets: ["@babel/preset-env"], // 如果在 webpack 的配置文件中添加了babel预设的配置，就不需要在 外面的 babel 配置文件中再配置了；
         // }
       }
     ]
@@ -105,6 +115,11 @@ module.exports = {
       // 模板：以 public/index.html 为模板，创建新的html文件，并打包到 dist 文件下；
       // 这个新的html文件有两个特点：1、DOM结构与模板中的一致；2、会自动引入打包后的资源；
       template: path.resolve(__dirname, '../public/index.html'), // html模板路径可以为相对路径或者绝对路径；
+    }),
+    // 提取css成单独文件，并结合 HtmlWebpackPlugin 插件，可以实现 css 自动通过 link 标签引入到 html 文件中；
+    new MiniCssExtractPlugin({
+      // 定义输出文件名和目录
+      filename: "static/css/main.css",
     }),
   ],
   // 生产模式不需要devServer，要删掉

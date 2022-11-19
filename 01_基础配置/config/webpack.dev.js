@@ -89,7 +89,7 @@ module.exports = {
         exclude: /node_modules/, // 排除 node_modules 代码不编译
         loader: "babel-loader",
         // options: {
-        //   presets: ["@babel/preset-env"],
+        //   presets: ["@babel/preset-env"], // 如果在 webpack 的配置文件中添加了babel预设的配置，就不需要在 外面的 babel 配置文件中再配置了；
         // }
       }
     ]
