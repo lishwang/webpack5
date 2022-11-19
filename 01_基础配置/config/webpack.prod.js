@@ -5,6 +5,8 @@ const ESLintWebpackPlugin = require("eslint-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 // 打包时将 CSS 提取到单独的文件中，并结合 HtmlWebpackPlugin 插件，可以实现 css 自动通过 link 标签引入到 html 文件中；
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// css压缩
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 module.exports = {
   // 入口
@@ -169,6 +171,8 @@ module.exports = {
       // 定义输出文件名和目录
       filename: "static/css/main.css",
     }),
+    // css压缩
+    new CssMinimizerPlugin(),
   ],
   // 生产模式不需要devServer，要删掉
   // 开发服务器，需要运行 npx webpack serve 才能启动开发服务器，不会生成打包后的文件，而是在内存中编译打包的，而且修改完代码后自动打包且更新浏览器展示
