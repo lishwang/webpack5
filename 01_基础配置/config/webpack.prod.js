@@ -32,6 +32,18 @@ module.exports = {
           // 'style-loader', // 这个loader会动态创建style标签，将 js 中的css代码通过创建的style标签添加到html文件中使样式生效；
           MiniCssExtractPlugin.loader, // 把css文件提取成单独的文件，所以不需要引入style-loader来创建style标签了；
           'css-loader', // 将 css 资源编译成 commonjs 的模块到js 中；
+          // postcss-loader 必须使用在  "css-loader"  之前，且在  "less-loader"  等loader之后；
+          // 如果loader需要额外的配置，需要将该loader写成对象的形式；
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  "postcss-preset-env", // 能解决大多数样式兼容性问题
+                ],
+              },
+            },
+          },
         ]
       },
       // 处理less样式文件
@@ -41,6 +53,18 @@ module.exports = {
           // "style-loader",
           MiniCssExtractPlugin.loader, // 把css文件提取成单独的文件，所以不需要引入style-loader来创建style标签了；
           "css-loader",
+          // postcss-loader 必须使用在  "css-loader"  之前，且在  "less-loader"  等loader之后；
+          // 如果loader需要额外的配置，需要将该loader写成对象的形式；
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  "postcss-preset-env", // 能解决大多数样式兼容性问题
+                ],
+              },
+            },
+          },
           "less-loader", // 将less文件处理成css文件
         ],
       },
@@ -51,6 +75,18 @@ module.exports = {
           // "style-loader",
           MiniCssExtractPlugin.loader, // 把css文件提取成单独的文件，所以不需要引入style-loader来创建style标签了；
           "css-loader",
+          // postcss-loader 必须使用在  "css-loader"  之前，且在  "less-loader"  等loader之后；
+          // 如果loader需要额外的配置，需要将该loader写成对象的形式；
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  "postcss-preset-env", // 能解决大多数样式兼容性问题
+                ],
+              },
+            },
+          },
           "sass-loader", // 负责将 Sass 文件编译成 css 文件
         ],
       },
@@ -60,6 +96,18 @@ module.exports = {
           // "style-loader", 
           MiniCssExtractPlugin.loader, // 把css文件提取成单独的文件，所以不需要引入style-loader来创建style标签了；
           "css-loader",
+          // postcss-loader 必须使用在  "css-loader"  之前，且在  "less-loader"  等loader之后；
+          // 如果loader需要额外的配置，需要将该loader写成对象的形式；
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  "postcss-preset-env", // 能解决大多数样式兼容性问题
+                ],
+              },
+            },
+          },
           "stylus-loader"
         ],
       },
