@@ -14,10 +14,12 @@ module.exports = {
      * __dirname 是nodejs模块的一个变量，获取当前文件所在的文件夹的目录；
      * 'dist' 输出后的文件夹名称为 dist；
      */
-    path: path.resolve(__dirname, 'dist'), // 输出文件路径一般是绝对路径，所有打包后的文件都在这个路径下
+    // 配置了开发服务器后，不会真正的有文件输出，而是在内存中打包的，因此可以不写输出路径，也不需要配置clean来清空上次打包内容，但是输出文件名要写
+    path: undefined,
+    // path: path.resolve(__dirname, '../dist'), // 输出文件路径一般是绝对路径，所有打包后的文件都在这个路径下
     filename: 'static/js/main.js', // 入口文件输出打包后的文件名，其他文件打包后输出在其同级目录下
-    // 自动清空上次打包的内容
-    clean: true,
+    // 自动清空上次打包的内容（配置了开发服务器）
+    // clean: true,
   },
   // 加载器
   module: {
@@ -97,14 +99,14 @@ module.exports = {
     // 用于处理 Eslint 的插件
     new ESLintWebpackPlugin({
       // Eslint的配置选项，指定检查文件的根目录
-      context: path.resolve(__dirname, "src"), // 哪些文件要做Eslint检查，检查src文件下的所有文件
+      context: path.resolve(__dirname, "../src"), // 哪些文件要做Eslint检查，检查src文件下的所有文件
     }),
 
     // 配置 HTML 模板，可以借助插件来实现打包后 js 文件的自动引入到 html 文件中
     new HtmlWebpackPlugin({
       // 模板：以 public/index.html 为模板，创建新的html文件，并打包到 dist 文件下；
       // 这个新的html文件有两个特点：1、DOM结构与模板中的一致；2、会自动引入打包后的资源；
-      template: path.resolve(__dirname, 'public/index.html'), // html模板路径可以为相对路径或者绝对路径；
+      template: path.resolve(__dirname, '../public/index.html'), // html模板路径可以为相对路径或者绝对路径；
     }),
   ],
   // 开发服务器，需要运行 npx webpack serve 才能启动开发服务器，不会生成打包后的文件，而是在内存中编译打包的，而且修改完代码后自动打包且更新浏览器展示
