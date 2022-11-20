@@ -24,73 +24,77 @@ module.exports = {
   // 加载器
   module: {
     rules: [
-      // 处理css样式文件
       {
-        test: /\.css$/, // 检测css文件
-        // loader 的执行顺序：从右到左（从下到上）
-        use: [
-          'style-loader', // 将 js 中的css代码通过创建style标签添加到html文件中使样式生效；
-          'css-loader', // 将 css 资源编译成 commonjs 的模块到js 中；
-        ]
-      },
-      // 处理less样式文件
-      {
-        test: /\.less$/,
-        use: [
-          "style-loader",
-          "css-loader",
-          "less-loader", // 将less文件处理成css文件
-        ],
-      },
-      // 处理sass样式文件
-      {
-        test: /\.s[ac]ss$/,
-        use: [
-          "style-loader",
-          "css-loader",
-          "sass-loader", // 负责将 Sass 文件编译成 css 文件
-        ],
-      },
-      {
-        test: /\.styl$/,
-        use: ["style-loader", "css-loader", "stylus-loader"],
-      },
-      {
-        test: /\.(png|jpe?g|gif|webp)$/,
-        type: "asset", // 将符合条件的文件转换成base64格式的字符串，然后打包输出；
-        // 需要转换成base64格式的文件的条件
-        parser: {
-          // 如果图片不大于100kb，将会被转化成base64格式的图片字符串
-          dataUrlCondition: {
-            maxSize: 100 * 1024 // 100kb
+        oneOf: [
+          // 处理css样式文件
+          {
+            test: /\.css$/, // 检测css文件
+            // loader 的执行顺序：从右到左（从下到上）
+            use: [
+              'style-loader', // 将 js 中的css代码通过创建style标签添加到html文件中使样式生效；
+              'css-loader', // 将 css 资源编译成 commonjs 的模块到js 中；
+            ]
+          },
+          // 处理less样式文件
+          {
+            test: /\.less$/,
+            use: [
+              "style-loader",
+              "css-loader",
+              "less-loader", // 将less文件处理成css文件
+            ],
+          },
+          // 处理sass样式文件
+          {
+            test: /\.s[ac]ss$/,
+            use: [
+              "style-loader",
+              "css-loader",
+              "sass-loader", // 负责将 Sass 文件编译成 css 文件
+            ],
+          },
+          {
+            test: /\.styl$/,
+            use: ["style-loader", "css-loader", "stylus-loader"],
+          },
+          {
+            test: /\.(png|jpe?g|gif|webp)$/,
+            type: "asset", // 将符合条件的文件转换成base64格式的字符串，然后打包输出；
+            // 需要转换成base64格式的文件的条件
+            parser: {
+              // 如果图片不大于100kb，将会被转化成base64格式的图片字符串
+              dataUrlCondition: {
+                maxSize: 100 * 1024 // 100kb
+              }
+            },
+            generator: {
+              // 设置生成的图片名字以及打包输出的图片所在的目录
+              // hash 图片打包后会有一个唯一的id（图片默认情况下打包后的名字），这个id在webpack中被称为hash值；
+              // [hash:6] 表示取hash值的前六位最为图片的名字；
+              // ext 文件扩展名，之前是 .png 打包后 ext 还是 .png；
+              // query 查询参数，如果在url地址中写了其他参数，这里会携带上；
+              filename: 'static/images/[hash:6][ext][query]'
+            },
+          },
+          // 处理字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件；
+          {
+            test: /\.(ttf|woff2?|mp3|mp4|avi)$/, // 匹配字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件
+            type: "asset/resource", // 将文件原封不动的打包输出
+            generator: {
+              // 设置打包输出的文件名字以及打包输出的文件所在的目录
+              filename: 'static/media/[hash:6][ext][query]'
+            },
+          },
+          // webpack5 用 loader 处理 Babel 代码
+          {
+            test: /\.js$/,
+            exclude: /node_modules/, // 排除 node_modules 代码不编译
+            loader: "babel-loader",
+            // options: {
+            //   presets: ["@babel/preset-env"], // 如果在 webpack 的配置文件中添加了babel预设的配置，就不需要在 外面的 babel 配置文件中再配置了；
+            // }
           }
-        },
-        generator: {
-          // 设置生成的图片名字以及打包输出的图片所在的目录
-          // hash 图片打包后会有一个唯一的id（图片默认情况下打包后的名字），这个id在webpack中被称为hash值；
-          // [hash:6] 表示取hash值的前六位最为图片的名字；
-          // ext 文件扩展名，之前是 .png 打包后 ext 还是 .png；
-          // query 查询参数，如果在url地址中写了其他参数，这里会携带上；
-          filename: 'static/images/[hash:6][ext][query]'
-        },
-      },
-      // 处理字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件；
-      {
-        test: /\.(ttf|woff2?|mp3|mp4|avi)$/, // 匹配字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件
-        type: "asset/resource", // 将文件原封不动的打包输出
-        generator: {
-          // 设置打包输出的文件名字以及打包输出的文件所在的目录
-          filename: 'static/media/[hash:6][ext][query]'
-        },
-      },
-      // webpack5 用 loader 处理 Babel 代码
-      {
-        test: /\.js$/,
-        exclude: /node_modules/, // 排除 node_modules 代码不编译
-        loader: "babel-loader",
-        // options: {
-        //   presets: ["@babel/preset-env"], // 如果在 webpack 的配置文件中添加了babel预设的配置，就不需要在 外面的 babel 配置文件中再配置了；
-        // }
+        ]
       }
     ]
   },
