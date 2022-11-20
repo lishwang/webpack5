@@ -117,4 +117,6 @@ module.exports = {
   },
   // 模式
   mode: 'development',
+  // SourceMap（源代码映射）
+  devtool: "cheap-module-source-map",
 }

@@ -183,4 +183,6 @@ module.exports = {
   // },
   // 模式
   mode: 'production',
+  // SourceMap（源代码映射）
+  devtool: "source-map",
 }
