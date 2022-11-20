@@ -146,7 +146,8 @@ module.exports = {
           // webpack5 用 loader 处理 Babel 代码
           {
             test: /\.js$/,
-            exclude: /node_modules/, // 排除 node_modules 代码不编译
+            // exclude: /node_modules/, // 排除 node_modules 代码不编译；include、exclude不能同时使用；
+            include: path.resolve(__dirname, '../src'), // 只处理 src 下的文件；include、exclude不能同时使用；
             loader: "babel-loader",
             // options: {
             //   presets: ["@babel/preset-env"], // 如果在 webpack 的配置文件中添加了babel预设的配置，就不需要在 外面的 babel 配置文件中再配置了；
@@ -162,6 +163,8 @@ module.exports = {
     new ESLintWebpackPlugin({
       // Eslint的配置选项，指定检查文件的根目录
       context: path.resolve(__dirname, "../src"), // 哪些文件要做Eslint检查，检查src文件下的所有文件
+      exclude: "node_modules", // 排除 node_modules 代码不编译；include、exclude不能同时使用；
+      // include: path.resolve(__dirname, '../src'), // 只处理 src 下的文件；include、exclude不能同时使用；
     }),
 
     // 配置 HTML 模板，可以借助插件来实现打包后 js 文件的自动引入到 html 文件中
