@@ -1,3 +1,3 @@
 export default function alertFun (count) {
-  alert(count);
+  console.log(count + 0);
 }
