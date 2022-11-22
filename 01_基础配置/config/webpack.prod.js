@@ -7,6 +7,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // css压缩
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+// 压缩 js 代码的插件，不需要安装，内置模块
+const TerserPlugin = require("terser-webpack-plugin");
+
+// nodejs核心模块，直接使用
+const os = require("os");
+// 获取cpu核数
+const threads = os.cpus().length;
 
 module.exports = {
   // 入口
@@ -148,12 +155,22 @@ module.exports = {
             test: /\.js$/,
             // exclude: /node_modules/, // 排除 node_modules 代码不编译；include、exclude不能同时使用；
             include: path.resolve(__dirname, '../src'), // 只处理 src 下的文件；include、exclude不能同时使用；
-            loader: "babel-loader",
-            options: {
-              // presets: ["@babel/preset-env"], // 如果在 webpack 的配置文件中添加了babel预设的配置，就不需要在 外面的 babel 配置文件中再配置了；
-              cacheDirectory: true, // 开启babel编译缓存
-              cacheCompression: false, // 缓存文件不要压缩
-            }
+            use: [
+              {
+                loader: "thread-loader", // 开启多进程
+                options: {
+                  workers: threads, // 开启多线程的数量，就是 CPU 的核数；
+                },
+              },
+              {
+                loader: "babel-loader",
+                options: {
+                  // presets: ["@babel/preset-env"], // 如果在 webpack 的配置文件中添加了babel预设的配置，就不需要在 外面的 babel 配置文件中再配置了；
+                  cacheDirectory: true, // 开启babel编译缓存
+                  cacheCompression: false, // 缓存文件不要压缩
+                }
+              }
+            ],
           }
         ]
       }
@@ -170,6 +187,7 @@ module.exports = {
       cache: true, // 开启缓存
       // 缓存目录
       cacheLocation: path.resolve(__dirname, "../node_modules/.cache/.eslintcache"),
+      threads, // 开启多进程
     }),
 
     // 配置 HTML 模板，可以借助插件来实现打包后 js 文件的自动引入到 html 文件中
@@ -183,9 +201,32 @@ module.exports = {
       // 定义输出文件名和目录
       filename: "static/css/main.css",
     }),
-    // css压缩
-    new CssMinimizerPlugin(),
+
+    // css压缩 （可以写到optimization.minimizer里面，效果一样的）
+    // new CssMinimizerPlugin(),
+
+    // js压缩
+    // 当生产模式会默认开启TerserPlugin，但是我们需要进行其他配置，就要重新写了
+    // （可以写到optimization.minimizer里面，效果一样的）
+    // new TerserPlugin({
+    //   parallel: threads // 开启多进程
+    // })
   ],
+
+  // 一般压缩的内容放在这里
+  optimization: {
+    minimize: true,
+    minimizer: [
+      // css压缩 （可以写在插件plugins里面，效果一样的）
+      new CssMinimizerPlugin(),
+      // js压缩
+      // 当生产模式会默认开启TerserPlugin，但是我们需要进行其他配置，就要重新写了
+      // （可以写在插件plugins里面，效果一样的）
+      new TerserPlugin({
+        parallel: threads // 开启多进程
+      })
+    ],
+  },
   // 生产模式不需要devServer，要删掉
   // 开发服务器，需要运行 npx webpack serve 才能启动开发服务器，不会生成打包后的文件，而是在内存中编译打包的，而且修改完代码后自动打包且更新浏览器展示
   // devServer: {
