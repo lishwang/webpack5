@@ -9,6 +9,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 // 压缩 js 代码的插件，不需要安装，内置模块
 const TerserPlugin = require("terser-webpack-plugin");
+// 压缩图片
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 
 // nodejs核心模块，直接使用
 const os = require("os");
@@ -121,6 +123,7 @@ module.exports = {
                   // presets: ["@babel/preset-env"], // 如果在 webpack 的配置文件中添加了babel预设的配置，就不需要在 外面的 babel 配置文件中再配置了；
                   cacheDirectory: true, // 开启babel编译缓存
                   cacheCompression: false, // 缓存文件不要压缩
+                  plugins: ["@babel/plugin-transform-runtime"], // Babel 插件配置，减少代码体积
                 }
               }
             ],
@@ -178,7 +181,35 @@ module.exports = {
       // （可以写在插件plugins里面，效果一样的）
       new TerserPlugin({
         parallel: threads // 开启多进程
-      })
+      }),
+      // 压缩图片
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminGenerate,
+          options: {
+            plugins: [
+              ["gifsicle", { interlaced: true }],
+              ["jpegtran", { progressive: true }],
+              ["optipng", { optimizationLevel: 5 }],
+              [
+                "svgo",
+                {
+                  plugins: [
+                    "preset-default",
+                    "prefixIds",
+                    {
+                      name: "sortAttrs",
+                      params: {
+                        xmlnsOrder: "alphabetical",
+                      },
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+      }),
     ],
   },
 

@@ -9,6 +9,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 // 压缩 js 代码的插件，不需要安装，内置模块
 const TerserPlugin = require("terser-webpack-plugin");
+// 压缩图片
+// const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 
 // nodejs核心模块，直接使用
 const os = require("os");
@@ -225,7 +227,35 @@ module.exports = {
       // （可以写在插件plugins里面，效果一样的）
       new TerserPlugin({
         parallel: threads // 开启多进程
-      })
+      }),
+      // 压缩图片
+      // new ImageMinimizerPlugin({
+      //   minimizer: {
+      //     implementation: ImageMinimizerPlugin.imageminGenerate,
+      //     options: {
+      //       plugins: [
+      //         ["gifsicle", { interlaced: true }],
+      //         ["jpegtran", { progressive: true }],
+      //         ["optipng", { optimizationLevel: 5 }],
+      //         [
+      //           "svgo",
+      //           {
+      //             plugins: [
+      //               "preset-default",
+      //               "prefixIds",
+      //               {
+      //                 name: "sortAttrs",
+      //                 params: {
+      //                   xmlnsOrder: "alphabetical",
+      //                 },
+      //               },
+      //             ],
+      //           },
+      //         ],
+      //       ],
+      //     },
+      //   },
+      // }),
     ],
   },
   // 生产模式不需要devServer，要删掉
