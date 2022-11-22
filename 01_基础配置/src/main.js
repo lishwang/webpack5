@@ -1,5 +1,6 @@
 import sumFun from './js/sum'
 import countFun from './js/count'
+import { add } from './js/math'
 import './css/index.css'
 import './less/index.less'
 import "./sass/index.sass";
@@ -9,6 +10,7 @@ import './css/iconfont.css';
 
 console.log(sumFun(1, 2, 3, 4, 5));
 countFun(55);
+console.log(add(1, 1));
 
 // 判断是否支持HMR功能
 // 各个文件模块的监听的回调不会相互影响；哪一个模块发生变化，就执行哪一个回调；
