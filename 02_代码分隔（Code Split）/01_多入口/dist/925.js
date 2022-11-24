@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_01_more=self.webpackChunk_01_more||[]).push([[925],{925:(u,e,n)=>{function r(u,e){return u**e}function o(u,e){return u-e}n.r(e),n.d(e,{load_mul:()=>r,load_sub:()=>o})}}]);

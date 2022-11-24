@@ -5,8 +5,8 @@ const path = require('path');
 module.exports = {
   // 多入口，有几个入口就一定会有几个及以上的文件输出，至于会不会有多个以上文件的输出，需在optimization中配置splitChunks；
   entry: {
-    name1: './src/app.js',
-    name2: './src/main.js',
+    name_app: './src/app.js',
+    name_main: './src/main.js',
   },
 
   // [name]是webpack命名规则，使用chunk的name作为输出的文件名。
