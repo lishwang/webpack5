@@ -13,4 +13,5 @@ module.exports = {
   rules: {
     "no-var": 2, // 不能使用 var 定义变量，否则报错误级别的错误，2 等同于 error
   },
+  plugins: ["import"], // 解决eslint不识别 import 函数动态导入的语法的报错；
 };

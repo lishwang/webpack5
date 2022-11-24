@@ -269,4 +269,11 @@ module.exports = {
   mode: 'production',
   // SourceMap（源代码映射）
   devtool: "source-map",
+
+  optimization: {
+    // 代码分隔配置（动态加载的文件自动会被分隔成单独的文件打包）
+    splitChunks: {
+      chunks: "all", // 单入口时，代码分隔配置只需要这一个属性即可，其他配置一般都是用默认值，如果有特殊需求，可参考  02_代码分隔（Code Split） 文件中的配置；
+    }
+  },
 }

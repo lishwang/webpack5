@@ -25,3 +25,12 @@ if (module.hot) {
     console.log('sum.js文件热替换');
   });
 }
+
+// import函数 按需加载
+document.getElementById('after_load').onclick = function () {
+  // eslint不能识别 import 函数的动态导入语法，需要在 .eslintrc.js 中做额外配置
+  import('./js/after_load').then(({ mul, del }) => {
+    console.log(mul(3, 5));
+    console.log(del(5, 3));
+  })
+}
