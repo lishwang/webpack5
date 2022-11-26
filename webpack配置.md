@@ -1435,3 +1435,20 @@ module.exports = {
    ```
 
    
+
+### 统一处理输出资源的文件名
+
+- 对于 通过 type: asset 处理的资源可以统一设置输出文件名，不需要每个都配置 generator 属性；
+
+  ```
+  # webpack.config.js 文件内
+  module.exports = {
+    output: {
+      // 通过 type: asset 处理的资源的统一命名方式（例如 图片、字体，这里配置之后可以删掉单独的配置generator属性）
+      assetModuleFilename: "static/media/[name].[hash:6][ext][query]",
+      // 省略其他属性配置
+    },
+  }
+  ```
+
+  

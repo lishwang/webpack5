@@ -32,6 +32,8 @@ module.exports = {
     // chunkFilename给打包生成的非入口文件命名（包括动态导入输出的文件的命名）
     // [name] 取值为按需加载时 webpackChunkName 设置的值
     chunkFilename: "static/js/[name].chunk.js", // 动态导入输出资源命名方式
+    // 通过 type: asset 处理的资源的统一命名方式（例如 图片、字体，这里配置之后可以删掉单独的配置generator属性）
+    assetModuleFilename: "static/media/[name].[hash:6][ext][query]", // 图片、字体等资源命名方式（注意用hash）
     // 自动清空上次打包的内容
     clean: true,
   },
@@ -137,23 +139,25 @@ module.exports = {
                 maxSize: 100 * 1024 // 100kb
               }
             },
-            generator: {
-              // 设置生成的图片名字以及打包输出的图片所在的目录
-              // hash 图片打包后会有一个唯一的id（图片默认情况下打包后的名字），这个id在webpack中被称为hash值；
-              // [hash:6] 表示取hash值的前六位最为图片的名字；
-              // ext 文件扩展名，之前是 .png 打包后 ext 还是 .png；
-              // query 查询参数，如果在url地址中写了其他参数，这里会携带上；
-              filename: 'static/images/[hash:6][ext][query]'
-            },
+            // 在出口中通过assetModuleFilename属性来统一配置 通过type: "asset"处理的资源文件，这里可以删掉generator的配置
+            // generator: {
+            //   // 设置生成的图片名字以及打包输出的图片所在的目录
+            //   // hash 图片打包后会有一个唯一的id（图片默认情况下打包后的名字），这个id在webpack中被称为hash值；
+            //   // [hash:6] 表示取hash值的前六位最为图片的名字；
+            //   // ext 文件扩展名，之前是 .png 打包后 ext 还是 .png；
+            //   // query 查询参数，如果在url地址中写了其他参数，这里会携带上；
+            //   filename: 'static/images/[hash:6][ext][query]'
+            // },
           },
           // 处理字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件；
           {
             test: /\.(ttf|woff2?|mp3|mp4|avi)$/, // 匹配字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件
             type: "asset/resource", // 将文件原封不动的打包输出
-            generator: {
-              // 设置打包输出的文件名字以及打包输出的文件所在的目录
-              filename: 'static/media/[hash:6][ext][query]'
-            },
+            // 在出口中通过assetModuleFilename属性来统一配置 通过type: "asset"处理的资源文件，这里可以删掉generator的配置
+            // generator: {
+            //   // 设置打包输出的文件名字以及打包输出的文件所在的目录
+            //   filename: 'static/media/[hash:6][ext][query]'
+            // },
           },
           // webpack5 用 loader 处理 Babel 代码
           {
@@ -205,7 +209,9 @@ module.exports = {
     // 提取css成单独文件，并结合 HtmlWebpackPlugin 插件，可以实现 css 自动通过 link 标签引入到 html 文件中；
     new MiniCssExtractPlugin({
       // 定义输出文件名和目录
-      filename: "static/css/main.css",
+      filename: "static/css/[name].css", // 适配多入口，可以写 动态名称[name]
+      // 定义动态导入（按需加载）的css文件的文件名
+      chunkFilename: "static/css/[name].chunk.css",
     }),
 
     // css压缩 （可以写到optimization.minimizer里面，效果一样的）
