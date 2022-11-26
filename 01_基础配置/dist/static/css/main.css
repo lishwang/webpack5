@@ -1,7 +1,7 @@
 .box1 {
   width: 100px;
   height: 100px;
-  background-image: url(../../static/images/fc988e.jpg);
+  background-image: url(../../static/media/222S45M0-3.fc988e.jpg);
   background-size: cover;
   /* user-select是c3样式，存在兼容性问题，需要用postcss-loader解决兼容性问题 */
   -webkit-user-select: none;
@@ -20,9 +20,9 @@
 .box5{width:100px;height:100px;background-color:#008000}
 @font-face {
   font-family: "iconfont"; /* Project id 3768344 */
-  src: url(../../static/media/99df8c.woff2?t=1668350904432) format('woff2'),
-       url(../../static/media/2c2028.woff?t=1668350904432) format('woff'),
-       url(../../static/media/fa6433.ttf?t=1668350904432) format('truetype');
+  src: url(../../static/media/iconfont.99df8c.woff2?t=1668350904432) format('woff2'),
+       url(../../static/media/iconfont.2c2028.woff?t=1668350904432) format('woff'),
+       url(../../static/media/iconfont.fa6433.ttf?t=1668350904432) format('truetype');
 }
 
 .iconfont {

@@ -1452,3 +1452,65 @@ module.exports = {
   ```
 
   
+
+### Preload / Prefetch 预先加载后续需要使用的资源
+
+##### 背景
+
+- 我们前面已经做了代码分割，同时会使用 import 动态导入语法来进行代码按需加载（我们也叫懒加载，比如路由懒加载就是这样实现的）。
+
+  但是加载速度还不够好，比如：是用户点击按钮时才加载这个资源的，如果资源体积很大，那么用户会感觉到明显卡顿效果。
+
+  我们想在浏览器空闲时间，加载 后续需要使用的资源。我们就需要用上 `Preload` 或 `Prefetch` 技术。
+
+##### 简介
+
+- **`Preload`：告诉浏览器立即加载 后续需要使用的资源。使用时需要设置as属性浏览器加载该文件的优先级。**
+- **`Prefetch`：告诉浏览器在空闲时才开始加载 后续需要使用的资源。**
+
+它们共同点：
+
+- **都只会加载后续需要使用的资源，并不执行。**
+- **都有缓存。当后续触发该资源加载时直接加载缓存。**
+
+它们区别：
+
+- `Preload`加载优先级高，`Prefetch`加载优先级低。
+- `Preload`只能加载当前页面需要使用的资源，`Prefetch`可以加载当前页面资源，也可以加载下一个页面需要使用的资源。
+
+总结：
+
+- 当前页面优先级高的资源用 `Preload` 加载。
+- 下一个页面需要使用的资源用 `Prefetch` 加载。
+
+它们的问题：兼容性较差。
+
+- 我们可以去 [Can I Use](https://caniuse.com/) 网站查询 HTML和CSS的 API 的兼容性问题。
+- `Preload` 相对于 `Prefetch` 兼容性好一点。
+
+##### 使用
+
+1. 安装包
+
+   ```
+   npm i @vue/preload-webpack-plugin -D
+   ```
+
+2. 配置webpack文件
+
+   ```
+   # webpack.config.js 文件内
+   
+   const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
+   module.exports = {
+     plugins: [
+     	new PreloadWebpackPlugin({
+         rel: "preload", // 把后续需要使用的js文件采用 preload 的方式加载，立即加载，需要设置as属性配置加载的优先级
+         as: "script", // 把后续需要使用的js文件当做 script 标签的优先级来加载，其中 style 的优先级最高
+         // rel: 'prefetch' // 把后续需要使用的js文件采用 prefetch 的方式加载，浏览器空闲时加载，不用设置as属性
+       }),
+     ]
+   }
+   ```
+
+   

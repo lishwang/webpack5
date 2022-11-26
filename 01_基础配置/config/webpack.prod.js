@@ -9,6 +9,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 // 压缩 js 代码的插件，不需要安装，内置模块
 const TerserPlugin = require("terser-webpack-plugin");
+// 设置浏览器闲时加载后续需要的资源还是立即加载资源
+const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
 // 压缩图片
 // const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 
@@ -223,6 +225,13 @@ module.exports = {
     // new TerserPlugin({
     //   parallel: threads // 开启多进程
     // })
+
+    // 设置浏览器闲时加载后续需要的资源还是立即加载资源
+    new PreloadWebpackPlugin({
+      rel: "preload", // 把后续需要使用的js文件采用 preload 的方式加载，立即加载，需要设置as属性配置加载的优先级
+      as: "script", // 把后续需要使用的js文件当做 script 标签的优先级来加载，其中 style 的优先级最高
+      // rel: 'prefetch' // 把后续需要使用的js文件采用 prefetch 的方式加载，浏览器空闲时加载，不用设置as属性
+    }),
   ],
 
   // 一般压缩的内容放在这里
