@@ -30,7 +30,7 @@ module.exports = {
     // 配置了开发服务器后，不会真正的有文件输出，而是在内存中打包的，因此可以不写输出路径，也不需要配置clean来清空上次打包内容，但是输出文件名要写
     path: undefined,
     // path: path.resolve(__dirname, '../dist'), // 输出文件路径一般是绝对路径，所有打包后的文件都在这个路径下
-    filename: 'static/js/main.js', // 入口文件输出打包后的文件名，其他文件打包后输出在其同级目录下
+    filename: 'static/js/[name].js', // 入口文件输出打包后的文件名，其他文件打包后输出在其同级目录下
     // chunkFilename给打包生成的非入口文件命名（包括动态导入输出的文件的命名）
     // [name] 取值为按需加载时 webpackChunkName 设置的值
     chunkFilename: "static/js/[name].chunk.js", // 动态导入输出资源命名方式
