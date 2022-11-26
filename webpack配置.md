@@ -1400,3 +1400,38 @@ module.exports = {
 
 - 路由的动态导入用的也是 import 函数，也会将代码进行分隔，打包成单独文件，从而实现路由的按需加载；
 - 对于在首屏加载时不需要的代码逻辑，可以打包在一个文件内，页面刚加载时不会立即去获取该资源，只有触发某条件时再去请求该资源；
+
+### 给按需加载的文件取名字（动态导入）
+
+- 通过 import 函数按需加载的文件，在打包之后生成的文件的文件名默认是随机的，因此不好分辨；可以使用webpack的魔法命名来给每一个按需加载的文件命名；
+
+##### 使用
+
+1. 在使用 import 函数进行按需加载文件时，使用webpack的魔法命名来给文件命名；
+
+   ```
+   // 给按需加载的after_load.js文件命名为after_load
+   // webpackChunkName: "after_load"：这是webpack动态导入模块命名的方式
+   // "after_load"将来就会作为下面chunkFilename的属性值[name]的值显示。
+   import(/* webpackChunkName: "after_load" */ "./js/after_load.js").then(({ mul }) => {
+       console.log(mul(2, 1));
+   });
+   ```
+
+2. chunkFilename给打包生成的非入口文件命名（包括动态导入输出的文件的命名）
+
+   ```
+   # webpack.config.js 文件内
+   module.exports = {
+     output: {
+       path: path.resolve(__dirname, "../dist"), // 生产模式需要输出
+       filename: "static/js/[name].js", // 入口文件打包输出资源命名方式
+       // chunkFilename给打包生成的非入口文件命名（包括动态导入输出的文件的命名）
+       // [name] 取值为按需加载时 webpackChunkName 设置的值
+       chunkFilename: "static/js/[name].chunk.js", // 动态导入输出资源命名方式
+       // 省略其他属性配置
+     },
+   }
+   ```
+
+   

@@ -29,7 +29,10 @@ if (module.hot) {
 // import函数 按需加载
 document.getElementById('after_load').onclick = function () {
   // eslint不能识别 import 函数的动态导入语法，需要在 .eslintrc.js 中做额外配置
-  import('./js/after_load').then(({ mul, del }) => {
+  // 给按需加载的after_load.js文件命名为after_load
+  // webpackChunkName: "after_load"：这是webpack动态导入模块命名的方式
+  // "after_load"将来就会作为下面chunkFilename的属性值[name]的值显示。
+  import(/* webpackChunkName: "after_load" */ './js/after_load').then(({ mul, del }) => {
     console.log(mul(3, 5));
     console.log(del(5, 3));
   })
