@@ -1514,3 +1514,79 @@ module.exports = {
    ```
 
    
+
+### Network Cache 缓存
+
+##### 背景：为什么文件名要加上hash值
+
+- 将来开发时我们对静态资源会使用缓存来优化，这样浏览器第二次请求资源就能读取缓存了，速度很快。
+
+  但是这样的话就会有一个问题, 因为前后输出的文件名是一样的，都叫 main.js，一旦将来发布新版本，因为文件名没有变化导致浏览器会直接读取缓存，不会加载新资源，项目也就没法更新了。
+
+  所以我们从文件名入手，确保更新前后文件名不一样，这样就可以做缓存了。
+
+##### hash值知识补充：
+
+- 每个单独打包生成的文件都会生成一个唯一的 hash 值。
+
+  - fullhash（webpack4 是 hash）
+
+  每次修改任何一个文件，所有文件名的 hash 至都将改变。所以一旦修改了任何一个文件，整个项目的文件缓存都将失效。
+
+  - chunkhash
+
+  根据不同的入口文件(Entry)进行依赖文件解析、构建对应的 chunk，生成对应的哈希值。我们 js 和 css 是同一个引入，会共享一个 hash 值。
+
+  - **contenthash**
+
+  根据文件内容生成 hash 值，只有文件内容变化了，hash 值才会变化。所有文件 hash 值是独享且不同的。
+
+- 在webpack的输出配置中可以见到hash的使用；
+
+##### 存在的问题以及解决方案
+
+###### 存在的问题
+
+- 当我们修改 after_load.js 文件再重新打包的时候，因为 contenthash 原因，after_load.js 文件 hash 值发生了变化，导致输出的after_load文件名发生变化（这是正常的）。
+
+  但是 main.js 文件的 hash 值也发生了变化，这会导致 main.js 的缓存失效。明明我们只修改 after_load.js, 为什么 main.js 也会变身变化呢？
+
+  因为 main.js 文件中引用了 after_load.js 文件，所以 after_load 文件名变化时也间接导致了 main 文件的内容修改，hash改变，进而导致 main 的输出文件的文件名改变，导致 main.js 的缓存失效。
+
+###### 解决方案
+
+- 将 hash 值单独保管在一个 runtime 文件中。
+
+  我们最终输出三个文件：main、after_load、runtime。当 after_load文件发送变化，变化的是 after_load和 runtime 文件，main 不变。
+
+  runtime 文件只保存文件的 hash 值和它们与文件关系，整个文件体积就比较小，所以变化重新请求的代价也小。
+
+```
+# webpack.config.js 文件内
+
+module.exports = {
+  output: {
+  	path: path.resolve(__dirname, '../dist'), // 输出文件路径一般是绝对路径，所有打包后的文件都在这个路径下
+    // [contenthash:8]使用contenthash（上面有介绍该hash属性），取8位长度
+    filename: 'static/js/[name].[contenthash:8].js', // 入口文件输出打包后的文件名，其他文件打包后输出在其同级目录下
+    // chunkFilename给打包生成的非入口文件命名（包括动态导入输出的文件的命名）
+    // [name] 取值为按需加载时 webpackChunkName 设置的值
+    chunkFilename: "static/js/[name].[contenthash:8].chunk.js", // 动态导入输出资源命名方式
+    // 通过 type: asset 处理的资源的统一命名方式（例如 图片、字体，这里配置之后可以删掉单独的配置generator属性）
+    assetModuleFilename: "static/media/[name].[hash:6][ext][query]", // 图片、字体等资源命名方式（注意用hash）
+    // 自动清空上次打包的内容
+    clean: true,
+  }
+  optimization: {
+  	// 提取runtime文件，会将文件之间依赖的hash值提取成单独的文件来保管；
+    runtimeChunk: {
+      name: (entrypoint) => `runtime~${entrypoint.name}`, // runtime文件命名规则，打包后生成的单独文件的文件名
+    },
+  }
+}
+```
+
+##### 最终实现的效果是
+
+1. **当缓存的资源发生变化时，希望浏览器加载新的资源；**
+2. **当只有一个文件资源发生变化，希望只有这一个文件的缓存失效，其他文件的缓存不要受到影响；**

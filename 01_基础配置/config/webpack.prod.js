@@ -30,10 +30,11 @@ module.exports = {
      * 'dist' 输出后的文件夹名称为 dist；
      */
     path: path.resolve(__dirname, '../dist'), // 输出文件路径一般是绝对路径，所有打包后的文件都在这个路径下
-    filename: 'static/js/[name].js', // 入口文件输出打包后的文件名，其他文件打包后输出在其同级目录下
+    // [contenthash:8]使用contenthash，取8位长度
+    filename: 'static/js/[name].[contenthash:8].js', // 入口文件输出打包后的文件名，其他文件打包后输出在其同级目录下
     // chunkFilename给打包生成的非入口文件命名（包括动态导入输出的文件的命名）
     // [name] 取值为按需加载时 webpackChunkName 设置的值
-    chunkFilename: "static/js/[name].chunk.js", // 动态导入输出资源命名方式
+    chunkFilename: "static/js/[name].[contenthash:8].chunk.js", // 动态导入输出资源命名方式
     // 通过 type: asset 处理的资源的统一命名方式（例如 图片、字体，这里配置之后可以删掉单独的配置generator属性）
     assetModuleFilename: "static/media/[name].[hash:6][ext][query]", // 图片、字体等资源命名方式（注意用hash）
     // 自动清空上次打包的内容
@@ -211,9 +212,10 @@ module.exports = {
     // 提取css成单独文件，并结合 HtmlWebpackPlugin 插件，可以实现 css 自动通过 link 标签引入到 html 文件中；
     new MiniCssExtractPlugin({
       // 定义输出文件名和目录
-      filename: "static/css/[name].css", // 适配多入口，可以写 动态名称[name]
+      // [contenthash:8]使用contenthash，取8位长度
+      filename: "static/css/[name].[contenthash:8].css", // 适配多入口，可以写 动态名称[name]
       // 定义动态导入（按需加载）的css文件的文件名
-      chunkFilename: "static/css/[name].chunk.css",
+      chunkFilename: "static/css/[name].[contenthash:8].chunk.css",
     }),
 
     // css压缩 （可以写到optimization.minimizer里面，效果一样的）
@@ -275,6 +277,15 @@ module.exports = {
       //   },
       // }),
     ],
+
+    // 代码分隔配置（动态加载的文件自动会被分隔成单独的文件打包）
+    splitChunks: {
+      chunks: "all", // 单入口时，代码分隔配置只需要这一个属性即可，其他配置一般都是用默认值，如果有特殊需求，可参考  02_代码分隔（Code Split） 文件中的配置；
+    },
+    // 提取runtime文件，会将文件之间依赖的hash值提取成单独的文件来保管；
+    runtimeChunk: {
+      name: (entrypoint) => `runtime~${entrypoint.name}`, // runtime文件命名规则，打包后生成的单独文件的文件名
+    },
   },
   // 生产模式不需要devServer，要删掉
   // 开发服务器，需要运行 npx webpack serve 才能启动开发服务器，不会生成打包后的文件，而是在内存中编译打包的，而且修改完代码后自动打包且更新浏览器展示
@@ -287,11 +298,4 @@ module.exports = {
   mode: 'production',
   // SourceMap（源代码映射）
   devtool: "source-map",
-
-  optimization: {
-    // 代码分隔配置（动态加载的文件自动会被分隔成单独的文件打包）
-    splitChunks: {
-      chunks: "all", // 单入口时，代码分隔配置只需要这一个属性即可，其他配置一般都是用默认值，如果有特殊需求，可参考  02_代码分隔（Code Split） 文件中的配置；
-    }
-  },
 }
