@@ -5,7 +5,7 @@ module.exports = {
       // 按需加载core-js的polyfill，彻底解决 js 兼容性问题
       "useBuiltIns": "usage",
       "corejs": {
-        "version": "3",
+        "version": "3", // core-js 包的版本
         "proposals": true
       }
     }]

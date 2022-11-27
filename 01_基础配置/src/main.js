@@ -39,8 +39,24 @@ document.getElementById('after_load').onclick = function () {
 }
 
 
-// 添加promise代码，测试Core-js 彻底解决 js 兼容性问题
+// 添加promise代码，测试 Core-js 彻底解决 js 兼容性问题
 const promise = Promise.resolve();
 promise.then(() => {
   console.log("hello promise");
 });
+
+// PWA（渐进式网络应用程序），实现离线(offline) 时应用程序能够继续运行功能
+// 注册生成 service worker ，之后才能使用 PWA 技术
+// 由于 service worker 存在兼容性问题，因此做了判断
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then((registration) => {
+        console.log("SW registered: ", registration);
+      })
+      .catch((registrationError) => {
+        console.log("SW registration failed: ", registrationError);
+      });
+  });
+}

@@ -1689,3 +1689,109 @@ module.exports = {
        };
        ```
 
+
+
+### PWA（渐进式网络应用程序）
+
+##### 背景
+
+- 开发 Web App 项目，项目一旦处于网络离线情况，就没法访问了。
+
+  我们希望给项目提供离线体验。
+
+- 渐进式网络应用程序(progressive web application - PWA)：是一种可以提供类似于 native app(原生应用程序) 体验的 Web App 的技术。
+
+  其中最重要的是，在 **离线(offline)** 时应用程序能够继续运行功能。
+
+  内部通过 Service Workers 技术实现的。
+
+##### 使用
+
+1. 安装包
+
+   ```
+   npm i workbox-webpack-plugin -D
+   ```
+
+   
+
+2. 修改webpack配置文件
+
+   ```
+   # webpack.config.js 文件内
+   
+   // PWA（渐进式网络应用程序），实现离线(offline) 时应用程序能够继续运行功能
+   const WorkboxPlugin = require("workbox-webpack-plugin");
+   module.exports = {
+     plugins: [
+     	new WorkboxPlugin.GenerateSW({
+         // 这些选项帮助快速启用 ServiceWorkers
+         // 不允许遗留任何“旧的” ServiceWorkers
+         clientsClaim: true,
+         skipWaiting: true,
+       }),
+     ]
+   };
+   ```
+
+   
+
+3. 注册生成 service worker ，之后才能使用 PWA 技术
+
+   ```
+   # main.js 文件中
+   
+   // 由于 service worker 存在兼容性问题，因此做了判断
+   if ("serviceWorker" in navigator) {
+     window.addEventListener("load", () => {
+       navigator.serviceWorker
+         .register("/service-worker.js")
+         .then((registration) => {
+           console.log("SW registered: ", registration);
+         })
+         .catch((registrationError) => {
+           console.log("SW registration failed: ", registrationError);
+         });
+     });
+   }
+   ```
+
+4. 解决路径问题
+
+   - 此时如果直接通过 VSCode 访问打包后页面，在浏览器控制台会发现 `SW registration failed`。
+
+     因为我们打开的访问路径是：`http://127.0.0.1:5500/dist/index.html`。此时页面会去请求 `service-worker.js` 文件，请求路径是：`http://127.0.0.1:5500/service-worker.js`，这样找不到会 404。
+
+     实际 `service-worker.js` 文件路径是：`http://127.0.0.1:5500/dist/service-worker.js`。
+
+   1. 安装包（用来部署静态资源服务器的）
+
+      ```
+      npm i serve -g
+      ```
+
+      serve 也是用来启动开发服务器来部署代码查看效果的。
+
+   2. 运行指令，启动一个开发服务器，来部署 dist 文件夹下的所有资源
+
+      ```
+      // dist 就是打包文件的文件夹目录
+      serve dist
+      ```
+
+      此时通过 serve 启动的服务器我们 service-worker 就能注册成功了。
+
+   3. 直接打开该服务运行后的链接即可访问页面
+
+      ```
+      Serving!                               │
+         │                                          │
+         │   - Local:    http://localhost:3000      │
+         │   - Network:  http://192.168.43.5:3000   │
+         │                                          │
+         │   Copied local address to clipboard!  
+      ```
+
+5. 查看缓存后的资源
+
+   - 以上操作后，会把资源全部缓存在 service-worker 中，可以在 `浏览器=》Application =》 Service-Worker ` 中查看注册的文件情况；资源缓存的地址在 `浏览器=》Application =》Cache Storage ` 里面；

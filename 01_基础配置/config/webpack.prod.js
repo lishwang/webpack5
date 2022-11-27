@@ -13,6 +13,8 @@ const TerserPlugin = require("terser-webpack-plugin");
 const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
 // 压缩图片
 // const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+// PWA（渐进式网络应用程序），实现离线(offline) 时应用程序能够继续运行功能
+const WorkboxPlugin = require("workbox-webpack-plugin");
 
 // nodejs核心模块，直接使用
 const os = require("os");
@@ -233,6 +235,14 @@ module.exports = {
       rel: "preload", // 把后续需要使用的js文件采用 preload 的方式加载，立即加载，需要设置as属性配置加载的优先级
       as: "script", // 把后续需要使用的js文件当做 script 标签的优先级来加载，其中 style 的优先级最高
       // rel: 'prefetch' // 把后续需要使用的js文件采用 prefetch 的方式加载，浏览器空闲时加载，不用设置as属性
+    }),
+
+    // PWA（渐进式网络应用程序），实现离线(offline) 时应用程序能够继续运行功能
+    new WorkboxPlugin.GenerateSW({
+      // 这些选项帮助快速启用 ServiceWorkers
+      // 不允许遗留任何“旧的” ServiceWorkers
+      clientsClaim: true,
+      skipWaiting: true,
     }),
   ],
 
