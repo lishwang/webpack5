@@ -37,3 +37,10 @@ document.getElementById('after_load').onclick = function () {
     console.log(del(5, 3));
   })
 }
+
+
+// 添加promise代码，测试Core-js 彻底解决 js 兼容性问题
+const promise = Promise.resolve();
+promise.then(() => {
+  console.log("hello promise");
+});

@@ -1590,3 +1590,102 @@ module.exports = {
 
 1. **当缓存的资源发生变化时，希望浏览器加载新的资源；**
 2. **当只有一个文件资源发生变化，希望只有这一个文件的缓存失效，其他文件的缓存不要受到影响；**
+
+
+
+### Core-js 彻底解决 js 兼容性问题
+
+##### 背景：
+
+- 过去我们使用 babel 对 js 代码进行了兼容性处理，其中使用@babel/preset-env 智能预设来处理兼容性问题。
+
+  它能将 ES6 的一些语法进行编译转换，比如箭头函数、点点点运算符等。但是如果是 async 函数、promise 对象、数组的一些方法（includes）等，它没办法处理。
+
+  所以此时我们 js 代码仍然存在兼容性问题，一旦遇到低版本浏览器会直接报错。所以我们想要将 js 兼容性问题彻底解决。
+
+- `core-js` 是专门用来做 ES6 以及以上 API 的 `polyfill`。
+
+  `polyfill`翻译过来叫做垫片/补丁。就是用社区上提供的一段代码，让我们在不兼容某些新特性的浏览器上，使用该新特性。
+
+##### 使用
+
+1. 代码中增加 ES6+ 代码
+
+   ```
+   # main.js 文件内
+   
+   // 添加promise代码，测试Core-js 彻底解决 js 兼容性问题
+   const promise = Promise.resolve();
+   promise.then(() => {
+     console.log("hello promise");
+   });
+   ```
+
+2. 由于 eslint 不能识别 ES6+ 代码（例如 promise ），会报错，因此需要修改 eslint 配置
+
+   - 安装包
+
+     ```
+     npm i @babel/eslint-parser -D
+     ```
+
+   - 修改 eslint 的配置文件
+
+     ```
+     # .eslintrc.js 文件内
+     
+     module.exports = {
+       parser: "@babel/eslint-parser", // 支持最新的最终 ECMAScript 标准
+       // 其他属性省略
+     };
+     ```
+
+3. 使用`core-js`
+
+   - 安装包
+
+     ```
+     npm i core-js
+     ```
+
+   - 方式一：手动全部引入
+
+     ```
+     # main.js 文件内
+     
+     import "core-js";
+     ```
+
+     - 这样引入会将所有兼容性代码全部引入，体积太大了。我们只想引入 promise 的 `polyfill`。
+
+   - 方式二：手动按需引入 
+
+     - 只引入 promise 的  `polyfill` ，解决 promise 语法的兼容性问题；
+
+       ```
+       # main.js 文件内
+       
+       import "core-js/es/promise";
+       ```
+
+     - 只引入打包 promise 的 `polyfill`，打包体积更小。但是将来如果还想使用其他语法，我需要手动引入库很麻烦。
+
+   - 方式三：自动按需引入
+
+     - 需要借助 babel 实现自动按需引入
+
+       ```
+       # babel.config.js 文件内
+       
+       module.exports = {
+         // 智能预设：能够编译ES6语法
+         presets: [
+           [
+             "@babel/preset-env",
+             // 按需加载core-js的polyfill
+             { useBuiltIns: "usage", corejs: { version: "3", proposals: true } },
+           ],
+         ],
+       };
+       ```
+
