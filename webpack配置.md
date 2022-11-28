@@ -1795,3 +1795,98 @@ module.exports = {
 5. 查看缓存后的资源
 
    - 以上操作后，会把资源全部缓存在 service-worker 中，可以在 `浏览器=》Application =》 Service-Worker ` 中查看注册的文件情况；资源缓存的地址在 `浏览器=》Application =》Cache Storage ` 里面；
+
+
+
+
+
+------
+
+----
+
+---
+
+
+
+# React 脚手架
+
+## 项目搭建
+
+### 注意事项
+
+##### Babel
+
+- babel 直接使用 react-app 官方的配置即可
+
+```
+module.exports = {
+  // 使用react官方规则，可以在这个链接查看 react官方的babel配置有哪些
+  // https://github.com/facebook/create-react-app/blob/main/packages/babel-preset-react-app/create.js
+  presets: ["react-app"], // 预设
+};
+```
+
+
+
+##### eslint
+
+- eslint 可以继承 react 官方的配置 react-app ；
+
+```
+module.exports = {
+  extends: ["react-app"], // 继承 react 官方规则
+  parserOptions: {
+    babelOptions: {
+      presets: [
+        // 解决页面报错问题
+        ["babel-preset-react-app", false],
+        "babel-preset-react-app/prod",
+      ],
+    },
+  },
+};
+```
+
+
+
+##### 环境变量
+
+- 可以使用 cross-env 这个包来配置环境变量；
+
+###### 使用
+
+1. 安装包
+
+   ```
+   npm install --save-dev cross-env
+   ```
+
+2. 使用环境变量只需要在启动 webpack 指令前加上 cross-env NODE_ENV=development 或者 cross-env NODE_ENV=production 即可；
+
+   ```
+   # package.json 文件内
+   
+   "scripts": {
+       "start": "npm run dev",
+       "dev": "cross-env NODE_ENV=development webpack serve --config ./config/webpack.config.js",
+       "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js"
+     },
+   ```
+
+   
+
+##### 无法解析 .jsx 文件
+
+- 在webpack的配置文件中可以添加配置
+
+  ```
+  module.exports = {
+  	// webpack解析模块时加载的选项
+      resolve: {
+          // 模块引入时，不写后缀名时自动补全文件扩展名
+          extensions: [".jsx", ".js", ".json"],
+      },
+  }
+  ```
+
+  
