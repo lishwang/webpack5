@@ -4,13 +4,14 @@ const path = require("path");
 const ESLintWebpackPlugin = require("eslint-webpack-plugin");
 // html模板
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+// react js代码 热更新HMR
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
 // loader 抽离出公共方法
 const getStyleLoaders = (preProcessor) => {
   return [
-    "style-loader",
+    "style-loader", // css 样式经过 style-loader 的处理，已经具备 HMR 功能了，但是需要在webpack配置文件中开启hot
     "css-loader",
     {
       // 处理样式兼容性问题
@@ -83,10 +84,9 @@ module.exports = {
               cacheDirectory: true,
               // 缓存内容不压缩
               cacheCompression: false,
-              // 缓存内容存放路径
               plugins: [
                 // "@babel/plugin-transform-runtime", // presets中包含了
-                "react-refresh/babel", // 开启js的HMR功能
+                "react-refresh/babel", // react开启js的HMR功能（@pmmmwh/react-refresh-webpack-plugin 这个插件的babel配置）
               ],
             },
           },
@@ -113,7 +113,7 @@ module.exports = {
       template: path.resolve(__dirname, "../public/index.html"),
     }),
 
-    // 解决js的HMR功能运行时全局变量的问题
+    // react js代码 热更新HMR（解决js的HMR功能运行时全局变量的问题）
     new ReactRefreshWebpackPlugin(),
 
     // 将public下面的资源复制到dist目录去（除了index.html）
@@ -158,7 +158,7 @@ module.exports = {
   devServer: {
     open: true, // 自动打开浏览器
     host: "localhost",
-    port: 3000,
+    port: 3001,
     hot: true, // 开启热模块替换
     compress: true,
     historyApiFallback: true, // 解决react-router刷新404问题

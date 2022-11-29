@@ -1812,81 +1812,325 @@ module.exports = {
 
 ## 项目搭建
 
-### 注意事项
+### 搭建步骤
 
-##### Babel
+##### 目录框架
 
-- babel 直接使用 react-app 官方的配置即可
+1. 根目录创建 config 文件夹，内部创建 webpack.dev.js 开发环境配置文件，完成webpack基础配置；根目录创建 `public/index.html`  存放html模板；
+
+   ```
+   ### webpack.dev.js 文件内
+   
+   const path = require("path");
+   // eslint 插件
+   const ESLintWebpackPlugin = require("eslint-webpack-plugin");
+   // html模板
+   const HtmlWebpackPlugin = require("html-webpack-plugin");
+   
+   // loader 抽离出公共方法
+   const getStyleLoaders = (preProcessor) => {
+     return [
+       "style-loader", // css 样式经过 style-loader 的处理，已经具备 HMR 功能了，但是需要在webpack配置文件中开启hot
+       "css-loader",
+       {
+         // 处理样式兼容性问题
+         // 需要配合 package.json 文件内的 browserslist 来指定兼容哪些浏览器以及兼容哪些版本
+         loader: "postcss-loader",
+         options: {
+           postcssOptions: {
+             plugins: [
+               "postcss-preset-env", // 能解决大多数样式兼容性问题
+             ],
+           },
+         },
+       },
+       preProcessor,
+     ].filter(Boolean); // 过滤数组中为空的项（preProcessor没传的项）
+   };
+   
+   module.exports = {
+     entry: "./src/main.js",
+     output: {
+       path: undefined, // 配置了开发服务器，输出的文件都在内存中，没有真实的打包文件输出，因此路径不需要设置
+       filename: "static/js/[name].js",
+       chunkFilename: "static/js/[name].chunk.js", // 通过import函数动态导入的chunk输出文件命名
+       assetModuleFilename: "static/media/[hash:6][ext][query]", // 图片、字体图片等资源输出文件命名
+     },
+   
+     module: {
+       rules: [
+         {
+           oneOf: [
+             {
+               // 用来匹配 .css 结尾的文件
+               test: /\.css$/,
+               // use 数组里面 Loader 执行顺序是从右到左
+               use: getStyleLoaders(),
+             },
+             {
+               test: /\.less$/,
+               use: getStyleLoaders("less-loader"),
+             },
+             {
+               test: /\.s[ac]ss$/,
+               use: getStyleLoaders("sass-loader"),
+             },
+             {
+               test: /\.styl$/,
+               use: getStyleLoaders("stylus-loader"),
+             },
+             {
+               test: /\.(png|jpe?g|gif|svg)$/,
+               // 将符合条件的资源按照条件进行处理后在打包输出
+               type: "asset",
+               parser: {
+                 dataUrlCondition: {
+                   maxSize: 10 * 1024, // 小于10kb的图片会被base64处理
+                 },
+               },
+             },
+             {
+               test: /\.(ttf|woff2?)$/,
+               // 将资源原封不动的打包输出
+               type: "asset/resource",
+             },
+             {
+               test: /\.(jsx|js)$/,
+               include: path.resolve(__dirname, "../src"), // 指定处理范围
+               loader: "babel-loader",
+               options: {
+                 // babel 缓存
+                 cacheDirectory: true,
+                 // 缓存内容不压缩
+                 cacheCompression: false,
+               },
+             },
+           ],
+         },
+       ],
+     },
+   
+     plugins: [
+       // eslit
+       new ESLintWebpackPlugin({
+         context: path.resolve(__dirname, "../src"), // 处理那些文件
+         exclude: "node_modules", // 指定处理范围
+         cache: true, // 开启缓存
+         // eslint 缓存存放目录
+         cacheLocation: path.resolve(__dirname, "../node_modules/.cache/.eslintcache"),
+       }),
+       // 配置模板
+       new HtmlWebpackPlugin({
+         template: path.resolve(__dirname, "../public/index.html"),
+       }),
+     ],
+   
+     optimization: {
+       // 分包，代码分隔
+       splitChunks: {
+         chunks: "all",
+       },
+       // 解决代码分隔导致的缓存失效，当只有一个文件资源发生变化，希望只有这一个文件的缓存失效，其他文件的缓存不要受到影响
+       runtimeChunk: {
+         name: (entrypoint) => `runtime~${entrypoint.name}`,
+       },
+     },
+   
+     // 开发服务器，自动化配置
+     devServer: {
+       open: true, // 自动打开浏览器
+       host: "localhost",
+       port: 3001,
+       hot: true, // 开启热模块替换
+       compress: true,
+     },
+   
+     mode: "development",
+     // source-map，便于查找错误文件及位置，便于调试
+     devtool: "cheap-module-source-map",
+   }
+   ```
+
+   - 安装包
+
+   ```
+   npm install babel-loader babel-preset-react-app @babel/core eslint-webpack-plugin eslint-config-react-app html-webpack-plugin css-loader sass sass-loader less-loader style-loader stylus-loader postcss-loader postcss-preset-env webpack webpack-cli webpack-dev-server -D
+   ```
+
+2. 根目录创建 babel 配置文件 `babel.config.js`  ，以及 eslint 配置文件 `.eslintrc.js` ；
+
+   - babel 直接使用 react-app 官方的配置即可
+
+   ```
+   ### babel.config.js 文件内
+   
+   module.exports = {
+     // 使用react官方规则，可以在这个链接查看 react官方的babel配置有哪些
+     // https://github.com/facebook/create-react-app/blob/main/packages/babel-preset-react-app/create.js
+     presets: ["react-app"], // 预设
+   };
+   ```
+
+   - eslint 可以继承 react 官方的配置 react-app ；
+
+   ```
+   ### .eslintrc.js 文件内
+   
+   module.exports = {
+     extends: ["react-app"], // 继承 react 官方规则
+     parserOptions: {
+       babelOptions: {
+         presets: [
+           // 解决页面报错问题
+           ["babel-preset-react-app", false],
+           "babel-preset-react-app/prod",
+         ],
+       },
+     },
+   };
+   ```
+
+3. 初始化包管理工具 `npm init -y` ；
+
+4. 安装 react ，书写 react 代码；
+
+   ```
+   npm install react react-dom react-router-dom
+   ```
+
+5. 执行 `npx webpack serve` ;
+
+6. 如果报错如下（一）：
+
+   ![react-环境变量报错](.\img\react-环境变量报错.png)
+
+   原因：babel-preset-react-app 这个babel的预设必须要有环境变量来指定当前环境是开发环境、生成环境还是测试环境；
+
+   webpack中配置的 `mode: "development"` 是代码运行的时候读取的环境变量，并不是babel配置运行的时候能够读取的环境变量；
+
+   解决方案：**使用 cross-env 这个包来配置环境变量；**
+
+   使用：
+
+   1. 安装包
+
+      ```
+      npm install --save-dev cross-env
+      ```
+
+   2. 使用环境变量只需要在启动 webpack 指令前加上 cross-env NODE_ENV=development 或者 cross-env NODE_ENV=production 即可；
+
+      ```
+      # package.json 文件内
+      
+      "scripts": {
+          "start": "npm run dev",
+          "dev": "cross-env NODE_ENV=development webpack serve --config ./config/webpack.dev.js",
+          "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.prod.js"
+        },
+      ```
+
+   3. 执行 `npm start` ;
+
+7. 如果报错如下（二）：
+
+   ![react-模块后缀名识别错误报错](.\img\react-模块后缀名识别错误报错.png)
+
+   原因：如果文件后缀名为 `.jsx 、 .vue 、 .json` 等文件，会出现无法识别文件；
+
+   解决方案：完善 webpack 配置如下：
+
+   ```
+   ### webpack.dev.js 文件内
+   
+   module.exports = {
+   	// webpack解析模块时加载的选项
+       resolve: {
+           // 模块引入时，不写后缀名时自动补全文件扩展名
+           extensions: [".jsx", ".js", ".json"],
+       },
+   }
+   ```
+
+   执行 `npm start` ;
+
+### 常用配置
+
+##### HMR 模块热替换
+
+- 首先需要在webpack配置文件中开启 hot ；如下：
 
 ```
+### webpack.dev.js 文件内
+
 module.exports = {
-  // 使用react官方规则，可以在这个链接查看 react官方的babel配置有哪些
-  // https://github.com/facebook/create-react-app/blob/main/packages/babel-preset-react-app/create.js
-  presets: ["react-app"], // 预设
-};
-```
-
-
-
-##### eslint
-
-- eslint 可以继承 react 官方的配置 react-app ；
-
-```
-module.exports = {
-  extends: ["react-app"], // 继承 react 官方规则
-  parserOptions: {
-    babelOptions: {
-      presets: [
-        // 解决页面报错问题
-        ["babel-preset-react-app", false],
-        "babel-preset-react-app/prod",
-      ],
-    },
+	// 开发服务器，自动化配置
+  devServer: {
+    hot: true, // 开启热模块替换
+    // 其他属性省略
   },
-};
+}
 ```
 
+###### css 模块热替换
 
+- css 样式经过 style-loader 的处理，已经具备 HMR 功能了；
 
-##### 环境变量
+###### js 模块热替换
 
-- 可以使用 cross-env 这个包来配置环境变量；
-
-###### 使用
+- react 的 js 模块热替换 借助第三方包 实现
 
 1. 安装包
 
    ```
-   npm install --save-dev cross-env
+   npm install @pmmmwh/react-refresh-webpack-plugin react-refresh -D
    ```
 
-2. 使用环境变量只需要在启动 webpack 指令前加上 cross-env NODE_ENV=development 或者 cross-env NODE_ENV=production 即可；
+2. webpack中配置
+
+   - 注意：需要在 babel 的 plugins 中设置这个插件；
 
    ```
-   # package.json 文件内
+   ### webpack.dev.js 文件内
    
-   "scripts": {
-       "start": "npm run dev",
-       "dev": "cross-env NODE_ENV=development webpack serve --config ./config/webpack.config.js",
-       "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js"
-     },
+   // react js代码 热更新HMR
+   const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+   
+   module.exports = {
+       module: {
+           rules: [
+               {
+               	oneOf: [
+               		{
+                           test: /\.(jsx|js)$/,
+                           include: path.resolve(__dirname, "../src"), // 指定处理范围
+                           loader: "babel-loader",
+                           options: {
+                             // babel 缓存
+                             cacheDirectory: true,
+                             // 缓存内容不压缩
+                             cacheCompression: false,
+                             plugins: [
+                               "react-refresh/babel", // react开启js的HMR功能（@pmmmwh/react-refresh-webpack-plugin 这个插件的babel配置）
+                             ],
+                           },
+                       },
+               	],
+               },
+           ],
+       },
+   	plugins: [
+   		// react js代码 热更新HMR（解决js的HMR功能运行时全局变量的问题）
+       	new ReactRefreshWebpackPlugin(),
+   	]
+   }
    ```
 
-   
+### React 前端路由
 
-##### 无法解析 .jsx 文件
+安装包
 
-- 在webpack的配置文件中可以添加配置
+```
+npm install react-router-dom
+```
 
-  ```
-  module.exports = {
-  	// webpack解析模块时加载的选项
-      resolve: {
-          // 模块引入时，不写后缀名时自动补全文件扩展名
-          extensions: [".jsx", ".js", ".json"],
-      },
-  }
-  ```
-
-  
