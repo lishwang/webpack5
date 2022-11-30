@@ -2128,9 +2128,92 @@ module.exports = {
 
 ### React 前端路由
 
-安装包
+##### 使用
 
-```
-npm install react-router-dom
-```
+1. 安装包
 
+   ```
+   npm install react-router-dom
+   ```
+
+2. 从 `react-router-dom` 中引入 `BrowserRouter` 组件
+
+   - 前端路由必须包裹在 BrowserRouter 标签下才能被解析，BrowserRouter内部会封装context语法做一些路由参数的通信等；
+
+   ```
+   ### main.js 文件内
+   
+   import React from 'react';
+   import ReactDOM from 'react-dom/client';
+   // 前端路由必须包裹在 BrowserRouter 标签下才能被解析，BrowserRouter内部会封装context语法做一些路由参数的通信等；
+   import { BrowserRouter } from 'react-router-dom';
+   import App from './App';
+   
+   // 生成root根节点
+   const root = ReactDOM.createRoot(document.getElementById('app'));
+   // 渲染App组件
+   root.render(<BrowserRouter>
+     <App />
+   </BrowserRouter>);
+   ```
+
+3. 从 `react-router-dom` 中引入 `Routes、Route` 组件
+
+   - 引入路由链接导航Link组件来进行路由跳转；引入Routes、Route用于加载显示路由组件。
+
+   ```
+   ### App.jsx 文件内
+   
+   import React from 'react';
+   // 引入路由链接导航Link组件来进行路由跳转
+   // 引入Routes、Route用于加载显示路由组件
+   import { Link, Routes, Route } from 'react-router-dom'
+   
+   import Home from './pages/home';
+   import About from './pages/about';
+   
+   function App() {
+     return (
+       <div>
+         <h1>App</h1>
+         {/* 导航链接 */}
+         <ul>
+           <li>
+             <Link to="/home">home</Link>
+           </li>
+           <li>
+             <Link to="/about">about</Link>
+           </li>
+         </ul>
+   
+         <Routes>
+           {/* 每一个Route就是一个路由组件，需要指定路由路径path 以及 要加载的路由组件element */}
+           <Route path='/home' element={ <Home /> }></Route>
+           <Route path='/about' element={ <About /> }></Route>
+         </Routes>
+       </div>
+     )
+   }
+   
+   export default App;
+   ```
+
+4. 执行 `npm start`  运行代码；
+
+5. 刷新页面发现路由找不到；解决方案：修改webpack配置
+
+   ```
+   module.exports = {
+       // 开发服务器，自动化配置
+       devServer: {
+           historyApiFallback: true, // 解决react-router刷新404问题
+           // 其他配置省略
+       },
+   }
+   ```
+
+   
+
+
+
+  
