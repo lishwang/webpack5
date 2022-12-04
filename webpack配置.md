@@ -839,6 +839,8 @@ module.exports = {
 
 - 但是在我们实际开发中，通常借助 vue 或 react 框架，它们有自带的 [vue-loader](https://github.com/vuejs/vue-loader) 和 [react-hot-loader](https://github.com/gaearon/react-hot-loader) ；因此跟css一样只需要在 webpack 配置文件中开启 HMR 功能即可自动实现模块的热替换；
 
+- react 的 js 模块热替换 借助第三方包 实现，参考本文档中 `React 脚手架 下的 HMR 模块热替换` ;
+
 
 
 ### OneOf
