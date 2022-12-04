@@ -1810,7 +1810,7 @@ module.exports = {
 
 # React 脚手架
 
-## 项目搭建
+## 开发环境项目搭建
 
 ### 搭建步骤
 
@@ -2219,3 +2219,280 @@ module.exports = {
 - 如果希望路由组件单独打包，可以借助路由懒加载实现；需要对组件的引入做处理
 
   
+
+## 生产环境项目搭建
+
+### 生产环境与开发环境webpack配置的不同点：
+
+##### 输出
+
+1. 生产环境需要配置输出文件路径
+
+2. 输出的文件名最好携带 contenthash 值，便于缓存；（contenthash 文件内容改变时，该值会改变，导致文件名改变，缓存更新）
+
+3. 自定清空上次打包内容
+
+   ```
+   ### webpack.prod.js 文件内
+   
+   module.exports = {
+   	output: {
+         path: path.resolve(__dirname, '../dist'),
+         filename: "static/js/[name].[contenthash:10].js",
+         chunkFilename: "static/js/[name].[contenthash:10].chunk.js", // 通过import函数动态导入的chunk输出文件命名
+         assetModuleFilename: "static/media/[hash:6][ext][query]", // 图片、字体图片等资源输出文件命名
+         clean: true, // 自动清空上次打包的内容
+       },
+   }
+   ```
+
+##### module（loader）
+
+1. 提取样式为单独文件
+
+   1. ```
+      # 安装包
+      npm install mini-css-extract-plugin -D
+      ```
+
+   2. 将所有的 `style-loader` 替换为 `MiniCssExtractPlugin.loader`
+
+   3. 插件中配置该包的配置
+
+   ```
+   ### webpack.prod.js 文件内
+   
+   // 提取css成单独文件
+   const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+   // loader 抽离出公共方法
+   const getStyleLoaders = (preProcessor) => {
+       return [
+           MiniCssExtractPlugin.loader, // css 样式经过 style-loader 的处理，已经具备 HMR 功能了，但是需要在webpack配置文件中开启hot
+           "css-loader",
+           {
+               // 处理样式兼容性问题
+               // 需要配合 package.json 文件内的 browserslist 来指定兼容哪些浏览器以及兼容哪些版本
+               loader: "postcss-loader",
+               options: {
+                   postcssOptions: {
+                       plugins: [
+                       	"postcss-preset-env", // 能解决大多数样式兼容性问题
+                       ],
+                   },
+           	},
+           },
+           preProcessor,
+       ].filter(Boolean); // 过滤数组中为空的项（preProcessor没传的项）
+   };
+   module.exports = {
+   	plugins: [
+   		// 提取css成单独文件
+           new MiniCssExtractPlugin({
+             filename: "static/css/[name].[contenthash:10].css",
+             chunkFilename: "static/css/[name].[contenthash:10].css",
+           }),
+   	]
+   }
+   ```
+
+2. 对样式文件进行压缩、对js文件进行压缩；（html文件在生产环境下会自动压缩）
+
+   1. ```
+      # 安装包
+      npm install css-minimizer-webpack-plugin -D
+      
+      # terser-webpack-plugin 随着webpack的下载自动下载的
+      ```
+
+   2. 配置插件
+
+   ```
+   ### webpack.prod.js 文件内
+   
+   // 对 css 文件进行压缩
+   const CssMinimizerWebpackPlugin = require("css-minimizer-webpack-plugin");
+   // 对 js 文件进行压缩
+   const TerserWebpackPlugin = require("terser-webpack-plugin");
+   module.exports = {
+   	optimization: {
+           // 分包，代码分隔
+           splitChunks: {
+             chunks: "all",
+           },
+           // 解决代码分隔导致的缓存失效，当只有一个文件资源发生变化，希望只有这一个文件的缓存失效，其他文件的缓存不要受到影响
+           runtimeChunk: {
+             name: (entrypoint) => `runtime~${entrypoint.name}`,
+           },
+           // 代码压缩(css、js)
+           minimizer: [new CssMinimizerWebpackPlugin(), new TerserWebpackPlugin()],
+       },
+   }
+   ```
+
+3. 修改mode 和 devtool
+
+   ```
+   ### webpack.prod.js 文件内
+   
+   module.exports = {
+       mode: "production",
+       // source-map，便于查找错误文件及位置，便于调试
+       devtool: "source-map",
+   }
+   ```
+
+4. 删除 devServer 开发服务器的自动化配置；(**删掉内容**)
+
+   ```
+   ### webpack.prod.js 文件内
+   
+   module.exports = {
+       // 开发服务器，自动化配置
+     devServer: {
+       open: true, // 自动打开浏览器
+       host: "localhost",
+       port: 3001,
+       hot: true, // 开启热模块替换
+       compress: true,
+       historyApiFallback: true, // 解决react-router刷新404问题
+     },
+   }
+   ```
+
+5. 删掉 HMR 相关的代码（生产模式不需要HMR模块热替换功能）
+
+   1. 从 `@pmmmwh/react-refresh-webpack-plugin` 包中引入的 `ReactRefreshWebpackPlugin`
+   2. 插件中的 `new ReactRefreshWebpackPlugin()`
+   3. `babel-loader` 中的 `plugins: ["react-refresh/babel"]`
+
+   ```
+   ### webpack.prod.js 文件内
+   
+   module.exports = {
+       plugins: [
+           // react js代码 热更新HMR（解决js的HMR功能运行时全局变量的问题）
+           new ReactRefreshWebpackPlugin(),
+       ]
+   }
+   ```
+
+6. 对图片进行压缩（依赖比较难下载）
+
+   1. ```
+      # 安装包
+      npm i image-minimizer-webpack-plugin imagemin -D
+      # 无损压缩
+      npm install imagemin-gifsicle imagemin-jpegtran imagemin-optipng imagemin-svgo -D
+      # 有损压缩
+      npm install imagemin-gifsicle imagemin-mozjpeg imagemin-pngquant imagemin-svgo -D
+      ```
+
+   2. webpack配置
+
+      ```
+      ### webpack.prod.js 文件内
+      
+      const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+      module.exports = {
+          optimization: {
+          // 压缩的操作
+          minimizer: [
+            new ImageMinimizerPlugin({
+              minimizer: {
+                implementation: ImageMinimizerPlugin.imageminGenerate,
+                options: {
+                  plugins: [
+                    ["gifsicle", { interlaced: true }],
+                    ["jpegtran", { progressive: true }],
+                    ["optipng", { optimizationLevel: 5 }],
+                    [
+                      "svgo",
+                      {
+                        plugins: [
+                          "preset-default",
+                          "prefixIds",
+                          {
+                            name: "sortAttrs",
+                            params: {
+                              xmlnsOrder: "alphabetical",
+                            },
+                          },
+                        ],
+                      },
+                    ],
+                  ],
+                },
+              },
+            }),
+          ],
+        }
+      }
+      ```
+
+7. 配置运行指令
+
+   ```
+   # package.json 文件内
+   
+   "scripts": {
+       "start": "npm run dev",
+       "dev": "cross-env NODE_ENV=development webpack serve --config ./config/webpack.dev.js",
+       "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.prod.js"
+   },
+   ```
+
+8. 页面tab栏加个图标
+
+   1. 将图标文件 `favicon.ico` 放置在 `public` 目录下
+
+   2. 在 `public` 文件下的 `index.html` 文件中引入该图标
+
+      ```
+      # index.html 文件内
+      
+      <!-- 引入页面图标 -->
+      <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+      ```
+
+   3. 修改webpack配置，将 public 文件下的所有资源（非 index.html ）在打包时默认拷贝到 dist 文件下
+
+      1. ```
+         ### 安装包
+         npm install copy-webpack-plugin --save-dev
+         ```
+
+      2. 修改webpack配置文件
+
+         ```
+         ### webpack.prod.js 文件内
+         
+         // 拷贝public文件下的静态资源到dist目录下（index.html文件除外）
+         const CopyPlugin = require("copy-webpack-plugin");
+         
+         module.exports = {
+             plugins: [
+                 // 将public下面的资源复制到dist目录去（除了index.html）
+                 new CopyPlugin({
+                   patterns: [
+                     {
+                       from: path.resolve(__dirname, "../public"),
+                       to: path.resolve(__dirname, "../dist"),
+                       toType: "dir",
+                       noErrorOnMissing: true, // 不生成错误
+                       globOptions: {
+                         // 忽略index.html文件
+                         ignore: ["**/index.html"],
+                       },
+                       info: {
+                         // 跳过terser压缩js
+                         minimized: true,
+                       },
+                     },
+                   ],
+                 }),
+             ]
+         }
+         ```
+
+   4. 通过 `npm run build` 打包后访问 `index.html` 文件 或者 `serve dist` 访问页面
+
