@@ -1,4 +1,4 @@
-// webpack.dev.js
+// webpack.dev.js （没有用到该文件，仅用于查看开发环境下的webpack配置）
 const path = require("path");
 // eslint 插件
 const ESLintWebpackPlugin = require("eslint-webpack-plugin");
