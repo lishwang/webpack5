@@ -8,8 +8,8 @@ import {Link, Routes, Route} from 'react-router-dom'
 // import Home from './pages/home';
 // import About from './pages/about';
 // 路由懒加载引入组件
-const Home = lazy(() => import('./pages/home'));
-const About = lazy(() => import('./pages/about'));
+const Home = lazy(() => import(/* webpackChunkName: "home" */ './pages/home'));
+const About = lazy(() => import(/* webpackChunkName: "about" */ './pages/about'));
 
 function App() {
   return (

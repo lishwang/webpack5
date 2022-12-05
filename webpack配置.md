@@ -2755,3 +2755,44 @@ module.exports = {
 
     
 
+## 打包的优化点
+
+### 调整打包的CacheGroups
+
+- 由于 node_modules 打包后的 js 文件比较大，因此对其进行分组，把 node_modules 中比较大的模块抽离出来进行单独打包；
+
+  ```
+  ### webpack.config.js 文件内
+  
+  module.exports = {
+  	optimization: {
+          // 分包，代码分隔
+          splitChunks: {
+                chunks: "all",
+                // 将匹配到的文件分组打包（react相关的分一组、antd UI组件库分为一组、剩余的node_modules包分为一组）
+                cacheGroups: {
+                      react: { // 分组名，没有实际的意义
+                        // 将 react、react-dom、react-router-dom 一起打包成一个js文件
+                        test: /[\\/]node_modules[\\/]react(.*)?[\\/]/, // 匹配到的内容被打包到一个js文件内
+                        name: "react-chunk", // 打包后的名称
+                        priority: 40, // 优先级，数值越大，打包的优先级越高（各个分组之间可能有交叉，优先级越高，权重越高，可以为负值）
+                      },
+                      // antd UI组件库单独打包
+                      antd: {
+                        test: /[\\/]node_modules[\\/]antd[\\/]/,
+                        name: "antd-chunk",
+                        priority: 30,
+                      },
+                      // 剩下的node_modules一起打包成一个文件
+                      libs: {
+                        test: /[\\/]node_modules[\\/]/,
+                        name: "libs-chunk",
+                        priority: 20,
+                      },
+                }
+          },
+    },
+  }
+  ```
+
+  
