@@ -3,6 +3,27 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require("vue-loader");
 
+// 抽离公共loader
+function common_loader_fun (loader) {
+  return [
+    "vue-style-loader",
+    "css-loader",
+    {
+      loader: "postcss-loader",
+      options: {
+        postcssOptions: {
+          plugins: [
+            [
+              "postcss-preset-env", // 能解决大多数样式兼容性问题
+            ],
+          ],
+        },
+      },
+    },
+    loader,
+  ].filter(Boolean);
+};
+
 module.exports = {
   entry: './src/main.js',
   output: {
@@ -16,76 +37,19 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
-        use: [
-          "vue-style-loader",
-          "css-loader",
-          {
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [
-                  [
-                    "postcss-preset-env",
-                  ],
-                ],
-              },
-            },
-          },
-        ],
+        use: common_loader_fun(),
       },
       {
         test: /\.less$/,
-        use: [
-          "vue-style-loader",
-          "css-loader",
-          {
-            loader: "postcss-loader",
-            options: {
-              plugins: [
-                [
-                  "postcss-preset-env",
-                ],
-              ],
-            },
-          },
-          "less-loader",
-        ],
+        use: common_loader_fun("less-loader"),
       },
       {
         test: /\.s[ac]ss$/,
-        use: [
-          "vue-style-loader",
-          "css-loader",
-          {
-            loader: "postcss-loader",
-            options: {
-              plugins: [
-                [
-                  "postcss-preset-env",
-                ],
-              ],
-            },
-          },
-          "sass-loader",
-        ],
+        use: common_loader_fun("sass-loader"),
       },
       {
         test: /\.styl$/,
-        use: [
-          "vue-style-loader",
-          "css-loader",
-          {
-            loader: "postcss-loader",
-            options: {
-              plugins: [
-                [
-                  "postcss-preset-env",
-                ],
-              ],
-            },
-          },
-          "stylus-loader"
-        ],
+        use: common_loader_fun("stylus-loader"),
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/,
@@ -144,5 +108,12 @@ module.exports = {
   resolve: {
     // 模块引入时，不写后缀名时自动补全文件扩展名
     extensions: [".vue", ".js", ".json"],
+  },
+  devServer: {
+    host: 'localhost',
+    port: 3333,
+    open: true,
+    hot: true,
+    historyApiFallback: true, // 解决vue-router刷新404问题
   },
 }
