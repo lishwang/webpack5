@@ -3029,3 +3029,20 @@ optimization: {
   ```
 
   
+
+## 生产环境项目搭建
+
+### 生产环境额外配置
+
+1.  css文件单独打包  --- mini-css-extract-plugin
+2. css压缩  --- css-minimizer-webpack-plugin
+3. js压缩  ---  terser-webpack-plugin
+4. 拷贝静态资源（如：网页图标）---  copy-webpack-plugin
+
+###  生产环境不需要配置
+
+1. style-loader 用 MiniCssExtractPlugin.loader 替代
+2. mode 属性值改为 production
+3. devtool 属性值改为 source-map 
+4. 删掉devServer配置
+5. 增加 output.path 路径

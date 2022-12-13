@@ -1,0 +1,1 @@
+{"version":3,"file":"static/css/src_view_home_index_vue.d4a6767018.chunk.css","mappings":";;;AACA;AACA;AAAA","sources":["webpack://04_vue_webpack/./src/view/home/index.vue"],"sourcesContent":["\n.title-home {\n  color: hotpink;\n}\n"],"names":[],"sourceRoot":""}
