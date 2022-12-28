@@ -27,7 +27,14 @@ function common_loader_fun (loader) {
         },
       },
     },
-    loader,
+    // 自定义主题配置，给sass-loader添加额外配置
+    loader && {
+      loader: loader,
+      options: loader === 'sass-loader' ? {
+        // element-plus自定义主题配置文件
+        additionalData: `@use "@/styles/element/index.scss" as *;`,
+      } : {},
+    },
   ].filter(Boolean);
 }
 
@@ -121,7 +128,12 @@ module.exports = {
       resolvers: [ElementPlusResolver()],
     }),
     Components({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver(
+        // element-plus自定义主题配置
+        {
+          importStyle: "sass",
+        }
+      )],
     }),
   ],
   mode: "development",
@@ -130,6 +142,10 @@ module.exports = {
   resolve: {
     // 模块引入时，不写后缀名时自动补全文件扩展名
     extensions: [".vue", ".js", ".json"],
+    // 配置路径别名
+    alias: {
+      "@": path.resolve(__dirname, "../src")
+    }
   },
   devServer: {
     host: 'localhost',

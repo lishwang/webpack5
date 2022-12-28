@@ -1,0 +1,15 @@
+@charset "UTF-8";
+/* 
+  element-plus 自定义主题
+  只需要重写你需要的即可，会覆盖掉组件默认颜色
+ */
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+$colors: (
+    'primary': (
+      'base': green,
+    ),
+    'success': (
+      'base': pink,
+    ),
+  ),
+);

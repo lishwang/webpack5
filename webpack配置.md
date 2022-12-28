@@ -3046,3 +3046,151 @@ optimization: {
 2. mode 属性值改为 production
 3. devtool 属性值改为 source-map 
 4. 删掉devServer配置
+
+## vue结合element-plus组件库基本使用
+
+### element-plus组件的引入以及基本使用
+
+##### element-plus组件的完整引入（具体以当前组件[官网](https://element-plus.gitee.io/zh-CN/guide/quickstart.html)-指南-快速开始-介绍为准）
+
+1. ```
+   # 安装
+   npm install element-plus
+   ```
+
+2. ```
+   # main.js 文件内完整引入并注册
+   
+   import ElementPlus from 'element-plus'
+   import 'element-plus/dist/index.css'
+   createApp(App).use(router).use(ElementPlus).mount(document.querySelector('#app'));
+   ```
+
+3. ```
+   # 组件中直接使用
+   
+   <el-button type="primary">主要按钮</el-button>
+   ```
+
+##### element-plus组件的按需引入（具体以当前组件[官网](https://element-plus.gitee.io/zh-CN/guide/quickstart.html)-指南-快速开始-介绍为准）
+
+1. ```
+   # 安装
+   npm install element-plus
+   npm install -D unplugin-vue-components unplugin-auto-import
+   ```
+
+2. ```
+   # webpack.dev.js 文件内
+   const AutoImport = require('unplugin-auto-import/webpack')
+   const Components = require('unplugin-vue-components/webpack')
+   const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+   
+   module.exports = {
+     // ...
+     plugins: [
+       AutoImport({
+         resolvers: [ElementPlusResolver()],
+       }),
+       Components({
+         resolvers: [ElementPlusResolver()],
+       }),
+     ],
+   }
+   ```
+
+3. ```
+   # 组件中使用
+   
+   <template>
+     <el-button type="primary">主要按钮</el-button>
+   </template>
+   <script>
+     import { ElButton } from 'element-plus'
+     export default {
+       components: { ElButton },
+     }
+   </script>
+   ```
+
+### element-plus组件的 主题自定义（具体以当前组件[官网](https://element-plus.gitee.io/zh-CN/guide/quickstart.html)-指南-主题-介绍为准）
+
+1. src 目录下创建文件 `styles/element/index.scss` ;
+
+   ```
+   # src/styles/element/index.scss 文件内
+   
+   /* 
+     element-plus 自定义主题
+     只需要重写你需要的即可，会覆盖掉组件默认颜色
+    */
+   @forward 'element-plus/theme-chalk/src/common/var.scss' with (
+   $colors: (
+       'primary': (
+         'base': green,
+       ),
+     ),
+   )
+   ```
+
+2. 修改 webpack 配置
+
+   ```
+   # webpack.dev.js 文件内
+   
+   // 抽离公共loader
+   function common_loader_fun (loader) {
+     return [
+       "vue-style-loader",
+       "css-loader",
+       {
+         loader: "postcss-loader",
+         options: {
+           postcssOptions: {
+             plugins: [
+               [
+                 "postcss-preset-env", // 能解决大多数样式兼容性问题
+               ],
+             ],
+           },
+         },
+       },
+       // 自定义主题配置，给sass-loader添加额外配置
+       loader && {
+         loader: loader,
+         options: loader === 'sass-loader' ? {
+           // element-plus自定义主题配置文件
+           additionalData: `@use "@/styles/element/index.scss" as *;`,
+         } : {},
+       },
+     ].filter(Boolean);
+   }
+   
+   module.exports = {
+     // ...
+     plugins: [
+       AutoImport({
+         resolvers: [ElementPlusResolver()],
+       }),
+       Components({
+         resolvers: [ElementPlusResolver(
+           // element-plus自定义主题配置
+           {
+             importStyle: "sass",
+           }
+         )],
+       }),
+     ],
+     // webpack解析模块时加载的选项
+     resolve: {
+       // 模块引入时，不写后缀名时自动补全文件扩展名
+       extensions: [".vue", ".js", ".json"],
+       // 配置路径别名
+       alias: {
+         "@": path.resolve(__dirname, "../src")
+       }
+     },
+   }
+   ```
+
+3. 直接打包或者 npm start 即可看到效果
