@@ -5,6 +5,11 @@ const { VueLoaderPlugin } = require("vue-loader");
 // 用于定义环境变量，给代码使用的
 const { DefinePlugin } = require('webpack');
 
+// element-plus 按需引入的配置插件
+const AutoImport = require('unplugin-auto-import/webpack')
+const Components = require('unplugin-vue-components/webpack')
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+
 // 抽离公共loader
 function common_loader_fun (loader) {
   return [
@@ -109,6 +114,14 @@ module.exports = {
     new DefinePlugin({
       "__VUE_OPTIONS_API__": true,
       "__VUE_PROD_DEVTOOLS__": false, // 在生产模式下开发工具要不要出现，不出现
+    }),
+
+    // element-plus 按需引入的配置插件
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
     }),
   ],
   mode: "development",
