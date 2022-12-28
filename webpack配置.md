@@ -1085,6 +1085,8 @@ module.exports = {
 
 
 
+### Performance: false, // 关闭性能分析，提升打包速度
+
 
 
 ---
@@ -3194,3 +3196,6 @@ optimization: {
    ```
 
 3. 直接打包或者 npm start 即可看到效果
+
+
+

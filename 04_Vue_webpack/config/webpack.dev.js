@@ -182,5 +182,6 @@ module.exports = {
     runtimeChunk: {
       name: (entrypoint) => `runtime~${entrypoint.name}`,
     },
-  }
+  },
+  Performance: false, // 关闭性能分析，提升打包速度
 }
