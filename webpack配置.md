@@ -3199,3 +3199,23 @@ optimization: {
 
 
 
+## 性能优化
+
+### Performance: false, // 关闭性能分析，提升打包速度
+
+### vue-loader 开启缓存
+
+```
+{
+    test: /\.vue$/,
+    loader: "vue-loader", // 内部会给vue文件注入HMR功能代码
+    options: {
+        // 开启缓存
+        cacheDirectory: path.resolve(
+        __dirname,
+        "node_modules/.cache/vue-loader"
+        ),
+    },
+},
+```
+
