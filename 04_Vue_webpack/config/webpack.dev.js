@@ -164,11 +164,17 @@ module.exports = {
           name: "vue-chunk",
           priority: 40, // 优先级
         },
+        // 将element-plus组件单独打包
+        elementPlus: {
+          test: /[\\/]node_modules[\\/]element-plus[\\/]/,
+          name: "elementPlus-chunk",
+          priority: 30,
+        },
         // 将剩余的node_modules内容单独打包
         rest_node_modules: {
           test: /[\\/]node_modules[\\/]/,
           name: "rest-node_modules",
-          priority: 30,
+          priority: 20,
         }
       }
     },
