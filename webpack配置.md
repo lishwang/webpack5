@@ -3344,9 +3344,15 @@ import Styles from '!!style-loader!css-loader?modules!./styles.css';
 
 ### 开发一个loader
 
+##### 首先搭建一个 js-webpack 的文件目录及环境
+
+- npm init -y  初始化包配置文件
+- 创建文件：public/index.html、src/main.js、loaders\my-first-loader.js、webpack.config.js；
+
 ##### 最简单的 loader 以及 loader 函数的介绍
 
 ```
+# loaders\my-first-loader.js 文件内
 /**
  * loader就是一个函数；
  * 当webpack解析资源时，会调用相应的loader去处理；
@@ -3361,5 +3367,57 @@ module.exports = function (content, map, meta) {
   console.log(content);
   return content;
 };
+```
+
+##### 在 webpack.config.js 文件中使用自定义的 loader
+
+```
+# webpack.config.js 文件内
+
+const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/[name].js',
+    clean: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        loader: './loaders/my-first-loader',
+      },
+      {
+        test: /\.js$/,
+        loader: './loaders/my-first-loader',
+      },
+      {
+        test: /\.js$/,
+        loader: './loaders/my-first-loader',
+      }
+    ],
+  },
+  plugins: [
+    new HTMLWebpackPlugin({
+      template: path.resolve(__dirname, 'public/index.html'),
+    })
+  ],
+  mode: 'development',
+}
+```
+
+##### 安装包
+
+```
+npm install -D html-webpack-plugin webpack webpack-cli
+```
+
+##### 打包
+
+```
+npx webpack
 ```
 
