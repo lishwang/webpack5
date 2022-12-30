@@ -3219,3 +3219,147 @@ optimization: {
 },
 ```
 
+
+
+
+
+---
+
+---
+
+---
+
+# webpack原理分析
+
+## Loader 原理
+
+### loader 概念
+
+- 帮助 webpack 将不同类型的文件转换为 webpack 可识别的模块。
+
+###  使用 loader 的方式
+
+- 配置方式：在 webpack.config.js 文件内指定 loader；
+- 内联方式：在每个 import 语句中显示指定 loader；（inline loader）
+
+### 配置方式 使用 loader
+
+#### loader 执行顺序
+
+##### 分类
+
+- pre： 前置 loader
+- normal： 普通 loader
+- inline： 内联 loader
+- post： 后置 loader
+
+##### 执行顺序
+
+- loader 的执行优级为：pre > normal > inline > post 。
+- 相同优先级的 loader 执行顺序为：从右到左，从下到上。
+
+**例如：loader没有加分类时默认为normal，普通 loader**
+
+```
+// 此时loader执行顺序：loader3 - loader2 - loader1
+module: {
+  rules: [
+    {
+      test: /\.js$/,
+      loader: "loader1",
+    },
+    {
+      test: /\.js$/,
+      loader: "loader2",
+    },
+    {
+      test: /\.js$/,
+      loader: "loader3",
+    },
+  ],
+},
+```
+
+**加上分类**
+
+```
+// 此时loader执行顺序：loader1 - loader2 - loader3
+module: {
+  rules: [
+    {
+      enforce: "pre",
+      test: /\.js$/,
+      loader: "loader1",
+    },
+    {
+      // 没有enforce就是normal
+      test: /\.js$/,
+      loader: "loader2",
+    },
+    {
+      enforce: "post",
+      test: /\.js$/,
+      loader: "loader3",
+    },
+  ],
+},
+```
+
+### 内联方式 使用 loader
+
+##### 用法及含义：
+
+```
+# 用法
+import Styles from 'style-loader!css-loader?modules!./styles.css'; 
+
+# 含义
+1、使用 css-loader 和 style-loader 处理 style.css 文件；
+2、多个 loader 使用 ! 分开；
+3、css-loader?modules 中的 ?modules 表示给 css-loader 这个 loader 传递 modules 参数；
+```
+
+##### `inline loader` 可以通过添加不同前缀，跳过其他类型 loader
+
+- `!` 跳过 normal loader。
+- `-!` 跳过 pre 和 normal loader。
+- `!!` 跳过 pre、 normal 和 post loader。
+
+**用法及含义：**
+
+```
+# 用法1
+import Styles from '!style-loader!css-loader?modules!./styles.css'; 
+
+# 含义
+1、如果在 webpack.config.js 文件中配置了对 .css 文件进行处理的 loader，而且这些loader的enforce分类为normal loader，就不执行在 webpack.config.js 文件中配置的enforce分类为normal loader的这些loader；其他类型loader照常执行；
+
+
+## 用法3
+import Styles from '!!style-loader!css-loader?modules!./styles.css'; 
+
+## 含义
+跳过在 webpack.config.js 文件中配置的对 .css 文件进行处理的 pre、 normal 和 post loader，即跳过 webpack.config.js 文件中配置的对 .css 文件进行处理的所有loader，当前文件./styles.css只被 style-loader!css-loader?modules! 这两个内联loader处理；
+```
+
+### 开发一个loader
+
+##### 最简单的 loader 以及 loader 函数的介绍
+
+```
+/**
+ * loader就是一个函数；
+ * 当webpack解析资源时，会调用相应的loader去处理；
+ * loader接收到文件内容作为参数，并将处理后的内容返回出去；
+ * loader函数接收三个参数：content、map、meta；
+ * content：文件内容；
+ * map：跟sourceMap相关；
+ * meta：别的loader函数传递的数据；
+ */
+
+module.exports = function (content, map, meta) {
+  console.log(content);
+  return content;
+};
+```
+

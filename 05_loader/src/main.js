@@ -1,0 +1,1 @@
+console.log('自己写一个简单loader')
