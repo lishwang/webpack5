@@ -13,11 +13,11 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        loader: './loaders/my-first-loader',
+        loader: './loaders/my-first-loader', // 使用自定义的 同步loader
       },
       {
         test: /\.js$/,
-        loader: './loaders/my-first-loader',
+        loader: './loaders/demo/sync-loader', // 使用自定义的 同步loader
       },
       {
         test: /\.js$/,
