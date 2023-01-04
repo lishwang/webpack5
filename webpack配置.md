@@ -3427,6 +3427,8 @@ npx webpack
 
 ##### 开发一个同步 loader
 
+- **注意：同步loader中不能进行异步操作；会执行报错**
+
 ```
 /**
  * 同步loader
@@ -3459,6 +3461,29 @@ module.exports = function (content, map, meta) {
    * 第四个参数：meta，给下一个loader传递参数；
    */
   this.callback(null, content, map, meta);
+}
+```
+
+
+
+### 异步 loader
+
+##### 开发一个异步loader
+
+- **注意：异步loader中的异步执行程序执行完成后才会进入下一个loader；**
+
+```
+/**
+ * 异步loader
+ */
+
+module.exports = function (content, map, meta) {
+  const callback = this.async();
+
+  setTimeout(() => {
+    console.log('这个异步loader异步操作执行完成后，才会进入下一个loader');
+    callback(null, content, map, meta);
+  }, 1000);
 }
 ```
 

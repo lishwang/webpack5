@@ -1,5 +1,6 @@
 /**
  * 同步loader
+ * 注意：同步loader中不能执行异步操作
  */
 
 /** 写法一：
@@ -13,15 +14,16 @@
  * meta：别的loader函数传递的数据；
  */
 
-module.exports = function (content, map, meta) {
-  console.log(content);
-  return content;
-};
+// module.exports = function (content, map, meta) {
+//   console.log(content);
+//   return content;
+// };
 
 /** 写法二：
  * 优点：如果这个loader处理之后还要下一个loader接着处理，可以采用这个方法，它能够保证source-map不中断，而且可以传递其他参数meta给下一个loader
  */
 module.exports = function (content, map, meta) {
+  console.log('同步loader');
   /**
    * 第一个参数：err，代表是否有错误，可以自己定义错误信息并传递下去；没有错误传递null；
    * 第二个参数：content，代表处理后的内容，必须向下传递；
