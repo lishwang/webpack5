@@ -3536,3 +3536,150 @@ rawLoader.raw = true;
 module.exports = rawLoader;
 ```
 
+
+
+### Pitching Loader
+
+##### 开发一个Pitching Loader
+
+- 注意1：多个 pitching loader 的执行顺序为：先从左到右执行 loader 链中的每个 loader 上的 pitch 方法（如果有），然后再从右到左执行 loader 链中的每个 loader 上的普通 loader 方法。
+
+  - 例如：同时使用 '04_Pitching-Loader1'、'04_Pitching-Loader2'、'04_Pitching-Loader3' 这三个pitching loader，且这三个loader的pitch方法中没有返回值时，执行顺序如下：
+
+  - 打印结果顺序：'pitch loader 1'、'pitch loader 2'、'pitch loader 3'、'normal loader 3'、'normal loader 2'、'normal loader 1';
+
+![](.\img\Pitching Loader1.png)
+
+- 注意2：在这个过程中如果任何 pitch 有返回值，则 loader 链被阻断。webpack 会跳过后面所有的的 pitch 和 loader，直接进入上一个 loader 。
+  - 例如：如果在 '04_Pitching-Loader2' 中的pitch方法中return了一个结果，执行顺序如下：
+  - 打印结果顺序：'pitch loader 1'、'pitch loader 2'、'normal loader 1';
+
+![Pitching Loader2](.\img\Pitching Loader2.png)
+
+```
+/**
+ * Pitching Loader
+ * 注意1：多个 pitching loader 的执行顺序为：
+ * 先从左到右执行 loader 链中的每个 loader 上的 pitch 方法（如果有），然后再从右到左执行 loader 链中的每个 loader 上的普通 loader 方法。
+ * 例如：同时使用 '04_Pitching-Loader1'、'04_Pitching-Loader2'、'04_Pitching-Loader3' 这三个pitching loader，且这三个loader的pitch方法中没有返回值时，执行顺序如下：
+ * 打印结果顺序：'pitch loader 1'、'pitch loader 2'、'pitch loader 3'、'normal loader 3'、'normal loader 2'、'normal loader 1';
+ * 
+ * 注意2：在这个过程中如果任何 pitch 有返回值，则 loader 链被阻断。webpack 会跳过后面所有的的 pitch 和 loader，直接进入上一个 loader 。
+ * 例如：如果在 '04_Pitching-Loader2' 中的pitch方法中return了一个结果，执行顺序如下：
+ * 打印结果顺序：'pitch loader 1'、'pitch loader 2'、'normal loader 1';
+ */
+
+module.exports = function (content) {
+  console.log('normal loader 1');
+  return content;
+}
+
+module.exports.pitch = function () {
+  console.log('pitch loader 1');
+}
+```
+
+- webpack.config.js 文件内
+
+```
+
+const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/[name].js',
+    clean: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        // loader的执行顺序是：从下到上，从右到左，从后到前（上一个loader是异步loader时也要等这个异步loader执行完再执行下一个loader）
+        use: [
+          './loaders/demo/04_Pitching-Loader1', // Pitching-Loader
+          './loaders/demo/04_Pitching-Loader2', // Pitching-Loader
+          './loaders/demo/04_Pitching-Loader3', // Pitching-Loader
+        ]
+      }
+    ],
+  },
+  plugins: [
+    new HTMLWebpackPlugin({
+      template: path.resolve(__dirname, 'public/index.html'),
+    })
+  ],
+  mode: 'development',
+}
+```
+
+##### 使用场景：
+
+- 当loader中遇到一些问题或者做一些事情的时候可以提前中断，不让后面的loader执行了，提前进入后面的流程；
+
+
+
+### 常见的 loader API
+
+- 更多文档，请查阅 [webpack 官方 loader api 文档](https://webpack.docschina.org/api/loaders/#the-loader-context)
+
+| 方法名                  | 含义                                       | 用法                                           |
+| ----------------------- | ------------------------------------------ | ---------------------------------------------- |
+| this.async              | 异步回调 loader。返回 this.callback        | const callback = this.async()                  |
+| this.callback           | 可以同步或者异步调用的并返回多个结果的函数 | this.callback(err, content, sourceMap?, meta?) |
+| this.getOptions(schema) | 获取 loader 的 options                     | this.getOptions(schema)                        |
+| this.emitFile           | 产生一个文件                               | this.emitFile(name, content, sourceMap)        |
+| this.utils.contextify   | 返回一个相对路径                           | this.utils.contextify(context, request)        |
+| this.utils.absolutify   | 返回一个绝对路径                           | this.utils.absolutify(context, request)        |
+
+
+
+###  手写 clean-log-loader
+
+- 作用：用来清理 js 代码中的`console.log(xxx)`；
+
+```
+# 05_clean-log-loader 文件内
+
+module.exports = function (content) {
+  // 用来清除文件内容中的 console.log(xxx);
+  return content.replace(/console\.log\(.*\);?/g, '');
+}
+```
+
+- webpack.config.js 文件内
+
+```
+
+const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/[name].js',
+    clean: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        // loader的执行顺序是：从下到上，从右到左，从后到前（上一个loader是异步loader时也要等这个异步loader执行完再执行下一个loader）
+        use: [
+          './loaders/demo/05_clean-log-loader', // clean-log-loader 自己写的loader，用于清除文件内容中的 console.log(xxx); 可以在打包后文件中查看打包内容；
+        ]
+      },
+    ],
+  },
+  plugins: [
+    new HTMLWebpackPlugin({
+      template: path.resolve(__dirname, 'public/index.html'),
+    })
+  ],
+  mode: 'development',
+}
+```
+
