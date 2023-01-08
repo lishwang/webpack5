@@ -3231,7 +3231,7 @@ optimization: {
 
 # webpack原理分析
 
-## Loader 原理
+## Loader 原理 及 常见loader分类
 
 ### loader 概念
 
@@ -3636,9 +3636,13 @@ module.exports = {
 
 
 
-###  手写 clean-log-loader
+## Loader 的使用（自定义loader）
 
-- 作用：用来清理 js 代码中的`console.log(xxx)`；
+###  手写 loader 清理 js 代码中的`console.log(xxx)`
+
+##### 作用：用来清理 js 代码中的`console.log(xxx)`；
+
+- loaders\test-loader\05_clean-log-loader.js
 
 ```
 # 05_clean-log-loader 文件内
@@ -3671,6 +3675,86 @@ module.exports = {
         use: [
           './loaders/demo/05_clean-log-loader', // clean-log-loader 自己写的loader，用于清除文件内容中的 console.log(xxx); 可以在打包后文件中查看打包内容；
         ]
+      },
+    ],
+  },
+  plugins: [
+    new HTMLWebpackPlugin({
+      template: path.resolve(__dirname, 'public/index.html'),
+    })
+  ],
+  mode: 'development',
+}
+```
+
+
+
+### 手写 loader 给 js 代码添加文本注释
+
+##### 作用：给 js 代码添加文本注释
+
+- **注意：schema.json 文件的作用；**
+
+- loaders/banner-loader/index.js
+
+```
+/**
+ * schema.json 文件的作用：
+ * 1、校验webpack中使用的 banner-loader 的 options 配置的 属性名 以及 属性值，包括属性值的类型；以及属性的个数；如果校验失败会报错；
+ */
+const schema = require('./schema.json');
+
+module.exports = function (content) {
+  // getOptions()方法 获取loader的options配置内容，同时对options内容进行校验；
+  // schema是options的校验规则（符合 JSON schema 规则）
+  const options = this.getOptions(schema);
+  const prefix = `
+    /*
+    * Author: ${options.author}
+    */
+  `;
+  return `${prefix} \n ${content}`;
+}
+```
+
+- loaders\banner-loader\schema.json
+
+```
+{
+	"type": "object", // 校验webpack中使用的 banner-loader 的 options 配置是个对象；
+	"properties": {
+		"author": { // 校验webpack中使用的 banner-loader 的 options 配置中有 author 属性，且属性值类型为 string ；
+			"type": "string"
+		}
+	},
+	"additionalProperties": false // 校验webpack中使用的 banner-loader 的 options 配置中没有其他属性；
+}
+// 如果以上有一条校验不通过，webpack打包的时候就会编译错误；
+```
+
+- webpack.config.js
+
+```
+
+const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/[name].js',
+    clean: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        loader: './loaders/banner-loader',
+        options: {
+          author: '老王',
+          // age: 18, // 报错：因为 loaders\banner-loader\schema.json 文件中只对author属性做了校验，且不允许新增其他属性；
+        }
       },
     ],
   },

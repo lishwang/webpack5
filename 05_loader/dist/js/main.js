@@ -15,7 +15,7 @@
   \*********************/
 /***/ (() => {
 
-eval("alert('main')\r\n\r\n\r\n\r\nalert('main')\n\n//# sourceURL=webpack://05_loader/./src/main.js?");
+eval("throw new Error(\"Module build failed (from ./loaders/banner-loader/index.js):\\nValidationError: Invalid options object. Loader has been initialized using an options object that does not match the API schema.\\n - options has an unknown property 'age'. These properties are valid:\\n   object { author? }\\n    at validate (C:\\\\Users\\\\WLS\\\\Desktop\\\\自己练习\\\\前端\\\\练习\\\\webpack5\\\\05_loader\\\\node_modules\\\\schema-utils\\\\dist\\\\validate.js:105:11)\\n    at Object.getOptions (C:\\\\Users\\\\WLS\\\\Desktop\\\\自己练习\\\\前端\\\\练习\\\\webpack5\\\\05_loader\\\\node_modules\\\\webpack\\\\lib\\\\NormalModule.js:585:19)\\n    at Object.module.exports (C:\\\\Users\\\\WLS\\\\Desktop\\\\自己练习\\\\前端\\\\练习\\\\webpack5\\\\05_loader\\\\loaders\\\\banner-loader\\\\index.js:10:24)\");\n\n//# sourceURL=webpack://05_loader/./src/main.js?");
 
 /***/ })
 
@@ -24,7 +24,7 @@ eval("alert('main')\r\n\r\n\r\n\r\nalert('main')\n\n//# sourceURL=webpack://05_l
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	// This entry module can't be inlined because the eval devtool is used.
+/******/ 	// This entry module doesn't tell about it's top-level declarations so it can't be inlined
 /******/ 	var __webpack_exports__ = {};
 /******/ 	__webpack_modules__["./src/main.js"]();
 /******/ 	
