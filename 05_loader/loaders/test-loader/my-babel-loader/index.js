@@ -1,4 +1,6 @@
+// 引入babel的核心库，调用其中的transform方法对js代码进行编译转换
 const babel = require("@babel/core");
+// 校验options配置
 const schema = require('./schema.json');
 
 module.exports = function (content) {
