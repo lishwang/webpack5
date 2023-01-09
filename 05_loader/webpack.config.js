@@ -43,12 +43,19 @@ module.exports = {
       //     './loaders/test-loader/05_clean-log-loader', // clean-log-loader 自己写的loader，用于清除文件内容中的 console.log(xxx); 可以在打包后文件中查看打包内容；
       //   ]
       // },
+      // {
+      //   test: /\.js$/,
+      //   loader: './loaders/test-loader/banner-loader',
+      //   options: {
+      //     author: '老王',
+      //     // age: 18, // 报错：因为 loaders\banner-loader\schema.json 文件中只对author属性做了校验，且不允许新增其他属性；
+      //   }
+      // },
       {
         test: /\.js$/,
-        loader: './loaders/banner-loader',
+        loader: './loaders/test-loader/my-babel-loader', // babel-loader功能简单实现
         options: {
-          author: '老王',
-          // age: 18, // 报错：因为 loaders\banner-loader\schema.json 文件中只对author属性做了校验，且不允许新增其他属性；
+          presets: ['@babel/preset-env']
         }
       },
     ],

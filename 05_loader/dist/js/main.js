@@ -7,6 +7,7 @@
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
 /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/main.js":
@@ -15,7 +16,7 @@
   \*********************/
 /***/ (() => {
 
-eval("throw new Error(\"Module build failed (from ./loaders/banner-loader/index.js):\\nValidationError: Invalid options object. Loader has been initialized using an options object that does not match the API schema.\\n - options has an unknown property 'age'. These properties are valid:\\n   object { author? }\\n    at validate (C:\\\\Users\\\\WLS\\\\Desktop\\\\自己练习\\\\前端\\\\练习\\\\webpack5\\\\05_loader\\\\node_modules\\\\schema-utils\\\\dist\\\\validate.js:105:11)\\n    at Object.getOptions (C:\\\\Users\\\\WLS\\\\Desktop\\\\自己练习\\\\前端\\\\练习\\\\webpack5\\\\05_loader\\\\node_modules\\\\webpack\\\\lib\\\\NormalModule.js:585:19)\\n    at Object.module.exports (C:\\\\Users\\\\WLS\\\\Desktop\\\\自己练习\\\\前端\\\\练习\\\\webpack5\\\\05_loader\\\\loaders\\\\banner-loader\\\\index.js:10:24)\");\n\n//# sourceURL=webpack://05_loader/./src/main.js?");
+eval("\n\nalert('main');\nconsole.log('自己写一个简单loader');\nconsole.log('111');\nconsole.log('222');\nalert('main');\nvar sum = function sum() {\n  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {\n    args[_key] = arguments[_key];\n  }\n  return args.reduce(function (p, c) {\n    return p + c;\n  }, 0);\n};\n\n//# sourceURL=webpack://05_loader/./src/main.js?");
 
 /***/ })
 
@@ -24,7 +25,7 @@ eval("throw new Error(\"Module build failed (from ./loaders/banner-loader/index.
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	// This entry module doesn't tell about it's top-level declarations so it can't be inlined
+/******/ 	// This entry module can't be inlined because the eval devtool is used.
 /******/ 	var __webpack_exports__ = {};
 /******/ 	__webpack_modules__["./src/main.js"]();
 /******/ 	
