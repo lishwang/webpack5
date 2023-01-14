@@ -3861,3 +3861,101 @@ module.exports = {
 }
 ```
 
+
+
+### 手写  file-loader 将文件原封不动输出出去
+
+- 在 webpack 中是通过设置 type 属性为 asset/resource 或 asset ，来实现将文件原封不动的输出出去；例如：
+
+  ```
+  // 处理字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件；
+  {
+      test: /\.(ttf|woff2?|mp3|mp4|avi)$/, // 匹配字体图标、音频、视频等不需要额外处理直接原封不动的打包输出的资源文件
+      type: "asset/resource", // 将文件原封不动的打包输出
+      generator: {
+          // 设置打包输出的文件名字以及打包输出的文件所在的目录
+          filename: 'static/media/[hash:6][ext][query]'
+      },
+  },
+  ```
+
+##### 手写 file-loader 实现将文件原封不动输出出去
+
+分为三步：
+
+1. 根据文件内容生成一个带有hash值的文件名称；
+
+   - ```
+     # 如何根据文件内容生成一个带有hash值的文件名称呢？
+     在webpack官方github仓库里有一个 loader-utils 工具库，里面有一个方法 interpolateName 可以解决这个问题；
+     使用前需要安装 loader-utils 工具库；
+     npm install loader-utils -D
+     ```
+
+   - [仓库地址](https://github.com/webpack)
+
+   - ```
+     // 1、根据文件内容生成一个带有hash值的文件名称；
+     const interpolatedName = loaderUtils.interpolateName(
+         this, // 上下文
+         '[hash].[ext][query]', // 新生成的文件名称
+         { content, } // 文件内容
+     );
+     // console.log(interpolatedName); // 带有hash值的文件名称
+     interpolatedName = `image/${interpolatedName}`; // 修改打包后的文件路径
+     ```
+
+2. 把这个带有hash值的文件名输出到dist目录；
+
+   - ```
+     // 2、把这个带有hash值的文件名输出出去；
+     // emitFile(文件名，文件内容) // 常见的 loader API
+     this.emitFile(interpolatedName, content);
+     ```
+
+3. 最后返回：`return "module.exports = '这个文件路径（带有hash值的文件名）'"`；
+
+   - ```
+     // 3、最后返回：`module.exports = '这个文件路径（带有hash值的文件名）`'
+     return `module.exports = ${interpolatedName}`;
+     ```
+
+注意：将文件原封不动输出出去；这种场景一般处理的都是图片、音频或者字体图标等文件，他们都是 buffer 二进制数据，需要使用 raw loader 才能处理；
+
+- webpack.config.js
+
+```
+
+const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/[name].js',
+    clean: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpe?g|gif)$/,
+        loader: './loaders/test-loader/file-loader', // 处理图片资源，打包时直接输出
+        type: 'javascript/auto', // 阻止webpack5默认处理这些资源，只使用自定义的file-loader来处理，否则会打包输出两份资源文件
+      },
+    ],
+  },
+  plugins: [
+    new HTMLWebpackPlugin({
+      template: path.resolve(__dirname, 'public/index.html'),
+    })
+  ],
+  mode: 'development',
+}
+```
+
+##### 问题1
+
+1. **问题：**webpack5 会默认处理图片、音频或者字体图标等文件，因此打包时会默认输出一份资源文件，再加上我们自己通过file-loader处理的文件，会打包输出两份相同的文件；
+
+   **解决：**loader中设置 type 属性值为 'javascript/auto'  ，用于阻止webpack5默认处理这些资源，只使用自定义的file-loader来处理，否则会打包输出两份资源文件；

@@ -1,3 +1,5 @@
+import './css/index.css'
+
 alert('main')
 console.log('自己写一个简单loader')
 console.log('111')

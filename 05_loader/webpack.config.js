@@ -58,6 +58,15 @@ module.exports = {
           presets: ['@babel/preset-env']
         }
       },
+      {
+        test: /\.(png|jpe?g|gif)$/,
+        loader: './loaders/test-loader/file-loader', // 处理图片资源，打包时直接输出
+        type: 'javascript/auto', // 阻止webpack5默认处理这些资源，只使用自定义的file-loader来处理，否则会打包输出两份资源文件
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      }
     ],
   },
   plugins: [
